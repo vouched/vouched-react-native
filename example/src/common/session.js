@@ -1,4 +1,4 @@
-import {VouchedSession } from 'react-native-vouched';
+import {VouchedSession } from '@vouched.id/vouched-react-native';
 
 let session;
 

@@ -28,7 +28,7 @@ yarn install
 cd ios && pod install && cd ..
 
 # gradle
-cd android && ./gradlew build && cd ..
+cd android && ./gradlew assemble && cd ..
 ```
 
 ### Run

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from 'react-native';
 import { StyleSheet, View } from 'react-native';
 import Footer from 'components/Footer';
-import { VouchedIdCamera } from 'react-native-vouched';
+import { VouchedIdCamera } from '@vouched.id/vouched-react-native';
 import { getSession} from '../common/session'
 
 const IDScreen = ({ navigation, route }) => {
