@@ -18,32 +18,40 @@ class VouchedIdCamera extends React.PureComponent {
       );
     };
 
+    restart = () => {
+      UIManager.dispatchViewManagerCommand(
+        findNodeHandle(this.cameraRef.current),
+        UIManager.IdCamera.Commands.restart,
+        []
+      );
+    };
+
     _onIdStream = (event) => {
-        if (!this.props.onIdStream) {
-            return;
-        }
-        this.props.onIdStream(event.nativeEvent)
+      if (!this.props.onIdStream) {
+        return;
+      }
+      this.props.onIdStream(event.nativeEvent)
     }
 
     render() {
-        return (
-            <View style={{
-                flex: 1,
-                flexDirection: 'column',
-              }}>
-                <IdCamera
-                    ref={this.cameraRef}
-                    style={StyleSheet.absoluteFill}
-                    onIdStream={this._onIdStream}
-                    enableDistanceCheck={this.props.enableDistanceCheck}
-                />
-            </View>
-        );
+      return (
+        <View style={{
+            flex: 1,
+            flexDirection: 'column',
+          }}>
+            <IdCamera
+              ref={this.cameraRef}
+              style={StyleSheet.absoluteFill}
+              onIdStream={this._onIdStream}
+              enableDistanceCheck={this.props.enableDistanceCheck}
+            />
+        </View>
+      );
     }
 }
 
 VouchedIdCamera.defaultProps = {
-    enableDistanceCheck: false
+  enableDistanceCheck: false
 }
 
 export { VouchedIdCamera };

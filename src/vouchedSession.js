@@ -10,7 +10,8 @@ export class VouchedSession {
 
     async postFrontId(cardDetectionResult, paramaters) {
         try {
-            return await VouchedSessionModule.postFrontId(cardDetectionResult);
+            const res = await VouchedSessionModule.postFrontId(cardDetectionResult);
+            return JSON.parse(res);
         } catch (e) {
             throw e
         }
@@ -18,7 +19,8 @@ export class VouchedSession {
     
     async postFace(faceDetectionResult) {
         try {
-            return await VouchedSessionModule.postFace(faceDetectionResult);
+            const res = await VouchedSessionModule.postFace(faceDetectionResult);
+            return JSON.parse(res);
         } catch (e) {
             throw e
         }
@@ -26,7 +28,21 @@ export class VouchedSession {
     
     async confirm() {
         try {
-            return await VouchedSessionModule.confirm();
+            const res = await VouchedSessionModule.confirm();
+            return JSON.parse(res);
+        } catch (e) {
+            throw e
+        }
+    }
+
+    async postAuthenticate(faceDetectionResult, jobId, matchId) {
+        try {
+            const res = await VouchedSessionModule.postAuthenticate({
+                image: faceDetectionResult.image,
+                jobId,
+                matchId
+            });
+            return JSON.parse(res);
         } catch (e) {
             throw e
         }

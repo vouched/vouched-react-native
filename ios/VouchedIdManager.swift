@@ -18,4 +18,12 @@ class IdCameraManager: RCTViewManager {
       }
     }
 
+    @objc func restart(_ node: NSNumber) {
+      DispatchQueue.main.async {
+        let camera = self.bridge.uiManager.view(
+          forReactTag: node
+        ) as! IdCamera
+        camera.start()
+      }
+    }
 }

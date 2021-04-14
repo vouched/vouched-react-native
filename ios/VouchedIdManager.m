@@ -5,5 +5,8 @@ RCT_EXPORT_VIEW_PROPERTY(onIdStream, RCTDirectEventBlock)
 RCT_EXTERN_METHOD(
   stop:(nonnull NSNumber *)node
 )
+RCT_EXTERN_METHOD(
+  restart:(nonnull NSNumber *)node
+)
 @end
 

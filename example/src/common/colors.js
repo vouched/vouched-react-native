@@ -1,0 +1,1 @@
+export const AUTH_BASE_COLOR = '#94b8b8';

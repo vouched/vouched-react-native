@@ -15,7 +15,7 @@ class IdCamera : BaseCamera {
     init(frame: CGRect) {
         super.init(frame: frame, position: .back)
                 
-        cardDetect = CardDetect(options: CardDetectOptionsBuilder().withEnableDistanceCheck(enableDistanceCheck).build())
+        cardDetect = CardDetect(options: CardDetectOptionsBuilder().withEnableDistanceCheck(currentEnableDistanceCheck).build())
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -27,13 +27,18 @@ class IdCamera : BaseCamera {
         runModel(onPixelBuffer: pixelBuffer)
     }
     
+    @objc override func start() {
+        cardDetect = CardDetect(options: CardDetectOptionsBuilder().withEnableDistanceCheck(currentEnableDistanceCheck).build())
+        super.start()
+    }
+    
     /** This method runs the live camera pixelBuffer through tensorFlow to get the result.
      */
     @objc func runModel(onPixelBuffer pixelBuffer: CVPixelBuffer) {
 
         if currentEnableDistanceCheck != enableDistanceCheck {
             currentEnableDistanceCheck = enableDistanceCheck
-            cardDetect = CardDetect(options: CardDetectOptionsBuilder().withEnableDistanceCheck(enableDistanceCheck).build())
+            cardDetect = CardDetect(options: CardDetectOptionsBuilder().withEnableDistanceCheck(currentEnableDistanceCheck).build())
         }
         
         let cardDetectResult = cardDetect.detect(pixelBuffer);

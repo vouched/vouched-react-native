@@ -9,7 +9,6 @@ class BaseCamera : UIView {
     
     // MARK: Storyboards Connections
     private var previewView: PreviewView!
-    private var overlayView: OverlayView!
     
     // MARK: Controllers that manage functionality
     private var cameraFeedManager: CameraFeedManager!
@@ -21,10 +20,6 @@ class BaseCamera : UIView {
 
         previewView =
             PreviewView(frame: frame)
-        overlayView =
-            OverlayView(frame: frame)
-        
-        overlayView.backgroundColor = UIColor(white: 1, alpha: 0)
         
         cameraFeedManager = CameraFeedManager(previewView: previewView, position: position)
                 
@@ -34,15 +29,30 @@ class BaseCamera : UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func reactSetFrame(_ frame: CGRect) {
+        self.frame = frame;
+        self.previewView.frame = frame;
+        super.reactSetFrame(frame)
+    }
+    
+    override func insertReactSubview(_ subview: UIView!, at atIndex: Int) {
+        insertSubview(subview, at: atIndex+1)
+        super.insertReactSubview(subview, at: atIndex);
+    }
+    
+    override func removeReactSubview(_ subview: UIView!) {
+        subview.removeFromSuperview()
+        super.removeReactSubview(subview)
+    }
+    
     override func layoutSubviews() {
+        super.layoutSubviews()
         if isStopped {
             return
         }
-        self.addSubview(previewView)
-        self.addSubview(overlayView)
-        
+        self.layer.insertSublayer(previewView.previewLayer, at: 0)
+
         cameraFeedManager.delegate = self
-        overlayView.clearsContextBeforeDrawing = true
         cameraFeedManager.checkCameraConfigurationAndStartSession()
     }
     
@@ -58,6 +68,11 @@ class BaseCamera : UIView {
         }
         isStopped = true
         cameraFeedManager.stopSession()
+    }
+    
+    @objc func start() {
+        isStopped = false
+        cameraFeedManager.checkCameraConfigurationAndStartSession()
     }
 }
 

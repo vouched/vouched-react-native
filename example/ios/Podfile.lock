@@ -262,11 +262,11 @@ PODS:
     - TensorFlowLiteSwift/Core (= 2.4.0)
   - TensorFlowLiteSwift/Core (2.4.0):
     - TensorFlowLiteC (= 2.4.0)
-  - Vouched (0.5.4):
+  - Vouched (0.5.6):
     - TensorFlowLiteSwift (~> 2.2)
-  - vouched-react-native (0.1.1):
+  - vouched-react-native (0.1.2):
     - React
-    - Vouched (= 0.5.4)
+    - Vouched (= 0.5.6)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -412,8 +412,8 @@ SPEC CHECKSUMS:
   RNScreens: b6c9607e6fe47c1b6e2f1910d2acd46dd7ecea3a
   TensorFlowLiteC: 09f8ac75a76caeadb19bcfa694e97454cc1ecf87
   TensorFlowLiteSwift: f062dc1178120100d825d7799fd9f115b4a37fee
-  Vouched: e64d80de8770dc16e0ba8f0bb50b0697afc5a5c0
-  vouched-react-native: ae8a0a5a0ab1391e72c2e19f0e7bad731deeabd8
+  Vouched: f8651eca07cddd6a623e9901e88ae190acab6685
+  vouched-react-native: 68131cb7358d34861cca1afee467b09fb8617155
   Yoga: 4bd86afe9883422a7c4028c00e34790f560923d6
 
 PODFILE CHECKSUM: a6a68de95012fec4b7474e52d695fb6750fa4bec

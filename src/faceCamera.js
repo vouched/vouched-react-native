@@ -11,19 +11,27 @@ class VouchedFaceCamera extends React.PureComponent {
     }
 
     stop = () => {
-        UIManager.dispatchViewManagerCommand(
-          findNodeHandle(this.cameraRef.current),
-          UIManager.FaceCamera.Commands.stop,
-          []
-        );
-      };
+      UIManager.dispatchViewManagerCommand(
+        findNodeHandle(this.cameraRef.current),
+        UIManager.FaceCamera.Commands.stop,
+        []
+      );
+    };
+
+    restart = () => {
+      UIManager.dispatchViewManagerCommand(
+        findNodeHandle(this.cameraRef.current),
+        UIManager.FaceCamera.Commands.restart,
+        []
+      );
+    };
       
     _onFaceStream = (event) => {
-        if (!this.props.onFaceStream) {
-          return;
-        }
-        this.props.onFaceStream(event.nativeEvent)
+      if (!this.props.onFaceStream) {
+        return;
       }
+      this.props.onFaceStream(event.nativeEvent)
+    }
 
     render() {
         return (

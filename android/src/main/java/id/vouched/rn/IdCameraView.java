@@ -1,156 +1,189 @@
 package id.vouched.rn;
 
 import android.annotation.SuppressLint;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.media.Image;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.util.Size;
+import android.view.Choreographer;
+import android.view.LayoutInflater;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.camera.core.CameraSelector;
+import androidx.camera.core.ImageAnalysis;
+import androidx.camera.core.ImageProxy;
+import androidx.camera.core.Preview;
+import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.camera.view.PreviewView;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
+
+import com.facebook.react.ReactActivity;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
-import com.google.android.cameraview.CameraView;
+import com.google.common.util.concurrent.ListenableFuture;
 
-import java.nio.ByteBuffer;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.function.Consumer;
+import java.util.concurrent.ExecutionException;
 
 import id.vouched.android.CardDetect;
-import id.vouched.android.CardDetectResult;
-import id.vouched.android.Step;
-import id.vouched.android.env.ImageUtils;
 import id.vouched.android.CardDetectOptions;
+import id.vouched.android.CardDetectResult;
 
-public class IdCameraView extends CameraView implements LifecycleEventListener {
+public class IdCameraView extends ConstraintLayout implements LifecycleEventListener, CardDetect.OnDetectResultListener {
     public static final String ON_ID_STREAM_EVENT = "onIdStream";
+    private static final Size DESIRED_PREVIEW_SIZE = new Size(960, 720);
 
     private final ThemedReactContext mThemedReactContext;
-    private int[] rgbBytes;
-    private byte[][] yuvBytes = new byte[3][];
-    private boolean isProcessingFrame = false;
+    private final CameraSelector cameraSelector;
+    private final ReactActivity activity;
+    private PreviewView previewView;
+    private ProcessCameraProvider cameraProvider;
+    private Preview previewUseCase;
+    private ImageAnalysis analysisUseCase;
+
+    private Handler handler;
+    private HandlerThread handlerThread;
 
     private CardDetect cardDetect;
 
-    public IdCameraView(ThemedReactContext themedReactContext, boolean fallbackToOldApi) {
-        super(themedReactContext, true);
+    private boolean isRendered = false;
+    private boolean isStopped = false;
+
+    public IdCameraView(@NonNull ThemedReactContext themedReactContext) {
+        super(themedReactContext);
+
         mThemedReactContext = themedReactContext;
-        themedReactContext.addLifecycleEventListener(this);
+        activity = (ReactActivity) themedReactContext.getCurrentActivity();
+        cardDetect = new CardDetect(themedReactContext.getAssets(), CardDetectOptions.defaultOptions(), this);
+        cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build();
 
-        addCallback(new Callback() {
+        ConstraintLayout layout = (ConstraintLayout) LayoutInflater.from(themedReactContext).inflate(R.layout.id_camera, this, true);
+        previewView = layout.findViewById(R.id.preview_view);
+        if (previewView == null) {
+            System.out.println("previewView is null");
+        }
 
-            @Override
-            public void onCameraOpened(CameraView cameraView) {
-                super.onCameraOpened(cameraView);
-            }
+        handlerThread = new HandlerThread("inference");
+        handlerThread.start();
+        handler = new Handler(handlerThread.getLooper());
 
-            @Override
-            public void onCameraClosed(CameraView cameraView) {
-                super.onCameraClosed(cameraView);
-            }
+        startCamera();
+        setupLayoutHack();
+    }
 
-            @Override
-            public void onPictureTaken(CameraView cameraView, byte[] data, int deviceOrientation) {
-                super.onPictureTaken(cameraView, data, deviceOrientation);
-            }
-
-            @Override
-            public void onRecordingStart(CameraView cameraView, String path, int videoOrientation, int deviceOrientation) {
-                super.onRecordingStart(cameraView, path, videoOrientation, deviceOrientation);
-            }
-
-            @Override
-            public void onRecordingEnd(CameraView cameraView) {
-                super.onRecordingEnd(cameraView);
-            }
-
-            @Override
-            public void onVideoRecorded(CameraView cameraView, String path, int videoOrientation, int deviceOrientation) {
-                super.onVideoRecorded(cameraView, path, videoOrientation, deviceOrientation);
-            }
-
-            @Override
-            public void onFramePreview(CameraView cameraView, final Image.Plane[] planes, final int width, final int height, int orientation) {
-                super.onFramePreview(cameraView, planes, width, height, orientation);
-
-                if (isProcessingFrame) {
-                    return;
-                }
-
-                if (cardDetect != null) {
-                    isProcessingFrame = true;
-
-                    if (rgbBytes == null) {
-                        rgbBytes = new int[width * height];
-                    }
-
-                    fillBytes(planes, yuvBytes);
-                    final int yRowStride = planes[0].getRowStride();
-                    final int uvRowStride = planes[1].getRowStride();
-                    final int uvPixelStride = planes[1].getPixelStride();
-
-                    Runnable convertImageAndDetect = new Runnable() {
-                        @Override
-                        public void run() {
-                            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-
-                            ImageUtils.convertYUV420ToARGB8888(
-                                    yuvBytes[0],
-                                    yuvBytes[1],
-                                    yuvBytes[2],
-                                    width,
-                                    height,
-                                    yRowStride,
-                                    uvRowStride,
-                                    uvPixelStride,
-                                    rgbBytes);
-
-                            bitmap.setPixels(rgbBytes, 0, width, 0, 0, width, height);
-                            cardDetect.processImage(bitmap, null, null, mBgHandler);
-                        }
-                    };
-
-                    mBgHandler.post(convertImageAndDetect);
-                }
-            }
-
-            @Override
-            public void onMountError(CameraView cameraView) {
-                super.onMountError(cameraView);
-            }
-        });
+    public void setEnableDistanceCheck(boolean enableDistanceCheck) {
+        cardDetect = new CardDetect(mThemedReactContext.getAssets(), new CardDetectOptions.Builder().withEnableDistanceCheck(enableDistanceCheck).build(), this);
     }
 
     @Override
-    public void stop() {
-        super.stop();
+    public void onHostResume() {
+        if (cardDetect != null) {
+            cardDetect.reset();
+        }
+        handlerThread = new HandlerThread("inference");
+        handlerThread.start();
+        handler = new Handler(handlerThread.getLooper());
+        bindAllCameraUseCases();
     }
 
+    @Override
+    public void onHostPause() {
+        if (handlerThread != null) {
+            handlerThread.quitSafely();
+            try {
+                handlerThread.join();
+                handlerThread = null;
+                handler = null;
+            } catch (final InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-    public void setEnableDistanceCheck(boolean enableDistanceCheck) {
-        cardDetect = new CardDetect(
-                mThemedReactContext.getCurrentActivity().getAssets(),
-                new CardDetectOptions.Builder().withEnableDistanceCheck(enableDistanceCheck).build(),
-                new Consumer<CardDetectResult>() {
+    @Override
+    public void onHostDestroy() {
+        if (cameraProvider != null) {
+            cameraProvider.unbindAll();
+        }
+    }
+
+    private void startCamera() {
+        final ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(mThemedReactContext);
+        cameraProviderFuture.addListener(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    cameraProvider = cameraProviderFuture.get();
+                    bindAllCameraUseCases();
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, ContextCompat.getMainExecutor(mThemedReactContext));
+    }
+
+    private void bindAllCameraUseCases() {
+        if (cameraProvider != null) {
+            // As required by CameraX API, unbinds all use cases before trying to re-bind any of them.
+            cameraProvider.unbindAll();
+            bindPreviewUseCase();
+            bindAnalysisUseCase();
+        }
+    }
+
+    private void bindPreviewUseCase() {
+        if (cameraProvider == null) {
+            return;
+        }
+        if (previewUseCase != null) {
+            cameraProvider.unbind(previewUseCase);
+        }
+
+        Preview.Builder builder = new Preview.Builder();
+        builder.setTargetResolution(DESIRED_PREVIEW_SIZE);
+        previewUseCase = builder.build();
+        previewUseCase.setSurfaceProvider(previewView.getSurfaceProvider());
+        cameraProvider.bindToLifecycle(activity, cameraSelector, previewUseCase);
+    }
+
+    private void bindAnalysisUseCase() {
+        if (cameraProvider == null) {
+            return;
+        }
+        if (analysisUseCase != null) {
+            cameraProvider.unbind(analysisUseCase);
+        }
+
+        ImageAnalysis.Builder builder = new ImageAnalysis.Builder();
+        builder.setTargetResolution(DESIRED_PREVIEW_SIZE);
+        analysisUseCase = builder.build();
+
+        analysisUseCase.setAnalyzer(
+                ContextCompat.getMainExecutor(activity),
+                new ImageAnalysis.Analyzer() {
+                    @SuppressLint("UnsafeExperimentalUsageError")
                     @Override
-                    public void accept(CardDetectResult cardDetectResult) {
-                        sendCardDetectEvent(cardDetectResult);
-                        // if result is postable, give time to stop camera
-                        if (Step.POSTABLE.equals(cardDetectResult.getStep())) {
-                            Timer timer = new Timer();
-                            timer.schedule(new TimerTask() {
-                                @Override
-                                public void run() {
-                                    isProcessingFrame = false;
-                                }
-                            }, 1000);
-                        } else {
-                            isProcessingFrame = false;
+                    public void analyze(@NonNull ImageProxy imageProxy) {
+                        try {
+                            if (cardDetect != null) {
+                                cardDetect.processImageProxy(imageProxy, handler);
+                            }
+                        } catch (Exception e) {
+                            System.out.println("Failed to process image. Error: " + e.getLocalizedMessage());
                         }
                     }
                 });
+
+        cameraProvider.bindToLifecycle(activity, cameraSelector, analysisUseCase);
+    }
+
+    @Override
+    public void onCardDetectResult(CardDetectResult cardDetectResult) {
+        isRendered = true;
+        sendCardDetectEvent(cardDetectResult);
     }
 
     private void sendCardDetectEvent(CardDetectResult cardDetectResult) {
@@ -164,71 +197,47 @@ public class IdCameraView extends CameraView implements LifecycleEventListener {
                 .receiveEvent(getId(), ON_ID_STREAM_EVENT, event);
     }
 
-    protected void fillBytes(final Image.Plane[] planes, final byte[][] yuvBytes) {
-        // Because of the variable row stride it's not possible to know in
-        // advance the actual necessary dimensions of the yuv planes.
-        for (int i = 0; i < planes.length; ++i) {
-            final ByteBuffer buffer = planes[i].getBuffer();
-            if (yuvBytes[i] == null) {
-                yuvBytes[i] = new byte[buffer.capacity()];
+    private void setupLayoutHack() {
+        Choreographer.getInstance().postFrameCallback(new Choreographer.FrameCallback() {
+            @Override
+            public void doFrame(long frameTimeNanos) {
+                if (isRendered) {
+                    Choreographer.getInstance().postFrameCallback(this);
+                    return;
+                }
+
+                manuallyLayoutChildren();
+                getViewTreeObserver().dispatchOnGlobalLayout();
+                Choreographer.getInstance().postFrameCallback(this);
             }
-            buffer.get(yuvBytes[i]);
+        });
+    }
+
+    private void manuallyLayoutChildren() {
+        for (int i = 0; i < getChildCount(); i++) {
+            View child = getChildAt(i);
+            child.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
+            child.layout(0, 0, child.getMeasuredWidth(), child.getMeasuredHeight());
         }
     }
 
-    @Override
-    public void onHostResume() {
-        start();
-    }
+    public void stop() {
+        if (isStopped) return;
+        isStopped = true;
 
-    @Override
-    public void onHostPause() {
-    }
-
-    @Override
-    public void onHostDestroy() {
-    }
-
-    @SuppressLint("MissingSuperCall")
-    @Override
-    public void requestLayout() {
-        // React handles this for us, so we don't need to call super.requestLayout();
-    }
-
-    @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        View preview = getView();
-        if (null == preview) {
-            return;
+        if (cameraProvider != null) {
+            cameraProvider.unbindAll();
         }
-        float width = right - left;
-        float height = bottom - top;
-        float ratio = getAspectRatio().toFloat();
-        int orientation = getResources().getConfiguration().orientation;
-        int correctHeight;
-        int correctWidth;
-        this.setBackgroundColor(Color.BLACK);
-        if (orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE) {
-            if (ratio * height < width) {
-                correctHeight = (int) (width / ratio);
-                correctWidth = (int) width;
-            } else {
-                correctWidth = (int) (height * ratio);
-                correctHeight = (int) height;
-            }
-        } else {
-            if (ratio * width > height) {
-                correctHeight = (int) (width * ratio);
-                correctWidth = (int) width;
-            } else {
-                correctWidth = (int) (height / ratio);
-                correctHeight = (int) height;
-            }
+        if (cardDetect != null) {
+            cardDetect.reset();
         }
-        int paddingX = (int) ((width - correctWidth) / 2);
-        int paddingY = (int) ((height - correctHeight) / 2);
-        preview.layout(paddingX, paddingY, correctWidth + paddingX, correctHeight + paddingY);
+    }
+
+    public void start() {
+        bindAllCameraUseCases();
+        isStopped = false;
+        isRendered = false;
     }
 
 }
-

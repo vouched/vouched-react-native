@@ -1,6 +1,7 @@
 package id.vouched.rn;
 
 import android.annotation.SuppressLint;
+import android.util.Size;
 import android.view.Choreographer;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,16 +25,15 @@ import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
 
 import id.vouched.android.FaceDetect;
 import id.vouched.android.FaceDetectOptions;
 import id.vouched.android.FaceDetectResult;
 import id.vouched.android.liveness.LivenessMode;
 
-public class FaceCameraView extends ConstraintLayout implements LifecycleEventListener {
-
+public class FaceCameraView extends ConstraintLayout implements LifecycleEventListener, FaceDetect.OnDetectResultListener {
     public static final String ON_FACE_STREAM_EVENT = "onFaceStream";
+    private static final Size DESIRED_PREVIEW_SIZE = new Size(960, 720);
 
     private final ThemedReactContext mThemedReactContext;
     private final CameraSelector cameraSelector;
@@ -45,12 +45,15 @@ public class FaceCameraView extends ConstraintLayout implements LifecycleEventLi
 
     private FaceDetect faceDetect;
 
+    private boolean isRendered = false;
+    private boolean isStopped = false;
+
     public FaceCameraView(@NonNull ThemedReactContext themedReactContext) {
         super(themedReactContext);
 
         mThemedReactContext = themedReactContext;
         activity = (ReactActivity) themedReactContext.getCurrentActivity();
-        faceDetect = new FaceDetect(themedReactContext, FaceDetectOptions.defaultOptions(), handleFaceDetectResult());
+        faceDetect = new FaceDetect(themedReactContext, FaceDetectOptions.defaultOptions(), this);
         cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_FRONT).build();
 
         ConstraintLayout layout = (ConstraintLayout) LayoutInflater.from(themedReactContext).inflate(R.layout.face_camera, this, true);
@@ -66,7 +69,7 @@ public class FaceCameraView extends ConstraintLayout implements LifecycleEventLi
     public void setLivenessMode(String value) {
         try {
             LivenessMode livenessMode = LivenessMode.valueOf(value);
-            faceDetect = new FaceDetect(mThemedReactContext, new FaceDetectOptions.Builder().withLivenessMode(livenessMode).build(), handleFaceDetectResult());
+            faceDetect = new FaceDetect(mThemedReactContext, new FaceDetectOptions.Builder().withLivenessMode(livenessMode).build(), this);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
@@ -75,7 +78,6 @@ public class FaceCameraView extends ConstraintLayout implements LifecycleEventLi
 
     @Override
     public void onHostResume() {
-        System.out.println(" ----------  onHostResume  -------------- ");
         if (faceDetect != null) {
             faceDetect.resume();
         }
@@ -84,7 +86,6 @@ public class FaceCameraView extends ConstraintLayout implements LifecycleEventLi
 
     @Override
     public void onHostPause() {
-        System.out.println(" ----------  onHostPause  -------------- ");
         if (cameraProvider != null) {
             cameraProvider.unbindAll();
         }
@@ -95,7 +96,6 @@ public class FaceCameraView extends ConstraintLayout implements LifecycleEventLi
 
     @Override
     public void onHostDestroy() {
-        System.out.println(" ----------  onHostDestroy  -------------- ");
         if (cameraProvider != null) {
             cameraProvider.unbindAll();
         }
@@ -138,7 +138,7 @@ public class FaceCameraView extends ConstraintLayout implements LifecycleEventLi
         }
 
         Preview.Builder builder = new Preview.Builder();
-//        builder.setTargetResolution(new Size(960, 720));
+        builder.setTargetResolution(DESIRED_PREVIEW_SIZE);
         previewUseCase = builder.build();
         previewUseCase.setSurfaceProvider(previewView.getSurfaceProvider());
         cameraProvider.bindToLifecycle(activity, cameraSelector, previewUseCase);
@@ -153,6 +153,7 @@ public class FaceCameraView extends ConstraintLayout implements LifecycleEventLi
         }
 
         ImageAnalysis.Builder builder = new ImageAnalysis.Builder();
+        builder.setTargetResolution(DESIRED_PREVIEW_SIZE);
         analysisUseCase = builder.build();
 
         analysisUseCase.setAnalyzer(
@@ -174,13 +175,10 @@ public class FaceCameraView extends ConstraintLayout implements LifecycleEventLi
         cameraProvider.bindToLifecycle(activity, cameraSelector, analysisUseCase);
     }
 
-    private Consumer<FaceDetectResult> handleFaceDetectResult() {
-        return new Consumer<FaceDetectResult>() {
-            @Override
-            public void accept(FaceDetectResult faceDetectResult) {
-                sendFaceDetectEvent(faceDetectResult);
-            }
-        };
+    @Override
+    public void onFaceDetectResult(FaceDetectResult faceDetectResult) {
+        isRendered = true;
+        sendFaceDetectEvent(faceDetectResult);
     }
 
     private void sendFaceDetectEvent(FaceDetectResult faceDetectResult) {
@@ -194,24 +192,25 @@ public class FaceCameraView extends ConstraintLayout implements LifecycleEventLi
                 .receiveEvent(getId(), ON_FACE_STREAM_EVENT, event);
     }
 
-
     private void setupLayoutHack() {
         Choreographer.getInstance().postFrameCallback(new Choreographer.FrameCallback() {
             @Override
             public void doFrame(long frameTimeNanos) {
-//                Log.d(TAG, "setupLayoutHack");
+                if (isRendered) {
+                    Choreographer.getInstance().postFrameCallback(this);
+                    return;
+                }
+
                 manuallyLayoutChildren();
                 getViewTreeObserver().dispatchOnGlobalLayout();
                 Choreographer.getInstance().postFrameCallback(this);
+
             }
         });
     }
 
     private void manuallyLayoutChildren() {
-//        System.out.println(" *** -- manuallyLayoutChildren");
         for (int i = 0; i < getChildCount(); i++) {
-//            System.out.println("manuallyLayoutChild: " + i);
-
             View child = getChildAt(i);
             child.measure(MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.EXACTLY),
                     MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY));
@@ -220,11 +219,23 @@ public class FaceCameraView extends ConstraintLayout implements LifecycleEventLi
     }
 
     public void stop() {
+        if (isStopped) return;
+        isStopped = true;
+
         if (cameraProvider != null) {
             cameraProvider.unbindAll();
         }
         if (faceDetect != null) {
             faceDetect.stop();
         }
+    }
+
+    public void start() {
+        if (faceDetect != null) {
+            faceDetect.resume();
+        }
+        bindAllCameraUseCases();
+        isStopped = false;
+        isRendered = false;
     }
 }

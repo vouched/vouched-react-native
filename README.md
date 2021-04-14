@@ -72,6 +72,19 @@ const job = await session.postFace(faceDetectionResult);
 `Parameters` - [FaceDetectResult](#facedetectresult-object)  
 `Returns` - [Job](#job-object)
 
+##### POST Authentication
+
+```javascript
+const authResult = await session.postAuthenticate(
+  faceDetectionResult,
+  jobId,
+  matchId
+);
+```
+
+`Parameters` - [FaceDetectResult](#facedetectresult-object), String, Boolean  
+`Returns` - [AuthenticateResult](#authenticateresult-object)
+
 ##### POST confirm verification
 
 ```javascript
@@ -114,10 +127,16 @@ import { VouchedIdCamera } from '@vouched.id/vouched-react-native';
 | enableDistanceCheck |                        Boolean                         |   false |
 | onIdStream          | Callback<[CardDetectResult](#carddetectresult-object)> |         |
 
-##### Stop Id Camera
+##### Stop IdCamera
 
 ```javascript
 cameraRef.current.stop();
+```
+
+##### Restart IdCamera
+
+```javascript
+cameraRef.current.restart();
 ```
 
 ### FaceCamera
@@ -154,10 +173,16 @@ import { VouchedFaceCamera } from '@vouched.id/vouched-react-native';
 | livenessMode |          [LivenessMode](#livenessmode-string)          | `"NONE"` |
 | onFaceStream | Callback<[FaceDetectResult](#facedetectresult-object)> |          |
 
-##### Stop Id Camera
+##### Stop FaceCamera
 
 ```javascript
 cameraRef.current.stop();
+```
+
+##### Restart FaceCamera
+
+```javascript
+cameraRef.current.restart();
 ```
 
 ### Types
@@ -230,6 +255,14 @@ Note: shouldn't be POSTed until the step is `"POSTABLE"`
 {
     "type" : String,
     "message": String
+}
+```
+
+##### AuthenticateResult `Object`
+
+```javascript
+{
+    "match": Number
 }
 ```
 

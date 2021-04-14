@@ -7,7 +7,8 @@ class VouchedSessionModule: NSObject {
     private static let POST_FRONT_ID_FAIL = "POST_FRONT_ID_FAIL"
     private static let POST_FACE_FAIL = "POST_FACE_FAIL"
     private static let POST_CONFIRM_FAIL = "POST_CONFIRM_FAIL"
-    
+    private static let POST_AUTHENTICATE_FAIL = "POST_AUTHENTICATE_FAIL"
+
     private var session: VouchedSession? = nil
     
     @objc func configure(_ apiKey: String) {
@@ -41,7 +42,7 @@ class VouchedSessionModule: NSObject {
 
         do {
             let job = try session?.postFrontId(detectedCard: cardDetectResult)
-            let jobString = convertJob(job!)
+            let jobString = convertObjToString(job!)
             resolve(jobString)
         } catch {
             reject(VouchedSessionModule.POST_FRONT_ID_FAIL, error.localizedDescription, error)
@@ -73,7 +74,7 @@ class VouchedSessionModule: NSObject {
 
         do {
             let job = try session?.postFace(detectedFace: faceDetectResult)
-            let jobString = convertJob(job!)
+            let jobString = convertObjToString(job!)
             resolve(jobString)
         } catch {
             reject(VouchedSessionModule.POST_FACE_FAIL, error.localizedDescription, error)
@@ -90,7 +91,7 @@ class VouchedSessionModule: NSObject {
         
         do {
             let job = try session?.postConfirm()
-            let jobString = convertJob(job!)
+            let jobString = convertObjToString(job!)
             resolve(jobString)
         } catch {
             reject(VouchedSessionModule.POST_CONFIRM_FAIL, error.localizedDescription, error)
@@ -98,12 +99,53 @@ class VouchedSessionModule: NSObject {
         
     }
     
-    private func convertJob(_ job: Job) -> String? {
+    @objc func postAuthenticate(_ authRequest: NSDictionary, resolver resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
+        
+        if session == nil {
+            reject(VouchedSessionModule.SESSION_NOT_CONFIGURED, "session must be configured", nil);
+            return;
+        }
+        
+        var image: String? = nil
+        var jobId: String? = nil
+        var matchId: Bool? = nil
+
+        let i = authRequest["image"]
+        let j = authRequest["jobId"]
+        let m = authRequest["matchId"]
+
+        if i is NSString {
+            image = (i as! String)
+        }
+        if j is NSString {
+            jobId = (j as! String)
+        }
+        if m is NSNumber {
+            matchId = (m as! NSNumber) == 1
+        }
+
+        if image == nil {
+            reject(VouchedSessionModule.POST_AUTHENTICATE_FAIL, "Unable to authenticate without an image.", nil)
+            return
+        } else if jobId == nil {
+            reject(VouchedSessionModule.POST_AUTHENTICATE_FAIL, "Unable to authenticate without a job id.", nil)
+            return
+        }
+        
+
         do {
-            let encoder = JSONEncoder();
-            let jobData = try encoder.encode(job)
-            let jobString = String(data: jobData, encoding: .utf8)!
-            return jobString
+            let auth = try session?.postAuthenticate(id: jobId!, userPhoto: image!, matchId: matchId)
+            let authString = convertObjToString(auth!)
+            resolve(authString)
+        } catch {
+            reject(VouchedSessionModule.POST_AUTHENTICATE_FAIL, error.localizedDescription, error)
+        }
+        
+    }
+    
+    private func convertObjToString<T>(_ auth: T) -> String? where T: Encodable {
+        do {
+            return String(data: try JSONEncoder().encode(auth), encoding: .utf8)!
         } catch {
             print(error)
         }

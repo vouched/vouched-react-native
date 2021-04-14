@@ -14,6 +14,7 @@ import java.util.Map;
 public class VouchedFaceManager extends SimpleViewManager<FaceCameraView> {
 
     public static final int COMMAND_FACE_CAMERA_STOP = 87;
+    public static final int COMMAND_FACE_CAMERA_START = 95;
 
     @NonNull
     @Override
@@ -24,8 +25,7 @@ public class VouchedFaceManager extends SimpleViewManager<FaceCameraView> {
     @NonNull
     @Override
     protected FaceCameraView createViewInstance(@NonNull ThemedReactContext reactContext) {
-        FaceCameraView view = new FaceCameraView(reactContext);
-        return view;
+        return new FaceCameraView(reactContext);
     }
 
     @ReactProp(name = "livenessMode")
@@ -45,17 +45,20 @@ public class VouchedFaceManager extends SimpleViewManager<FaceCameraView> {
     @Override
     public Map<String, Integer> getCommandsMap() {
         return MapBuilder.of(
-                "stop",
-                COMMAND_FACE_CAMERA_STOP
+                "stop", COMMAND_FACE_CAMERA_STOP,
+                "restart", COMMAND_FACE_CAMERA_START
         );
     }
 
     @Override
     public void receiveCommand(@NonNull FaceCameraView root, int commandId, @Nullable ReadableArray args) {
-        if (COMMAND_FACE_CAMERA_STOP == commandId) {
-            root.stop();
+        switch (commandId) {
+            case COMMAND_FACE_CAMERA_STOP:
+                root.stop();
+                break;
+            case COMMAND_FACE_CAMERA_START:
+                root.start();
+                break;
         }
     }
-
-
 }

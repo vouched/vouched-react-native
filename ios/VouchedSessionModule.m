@@ -14,4 +14,8 @@ RCT_EXTERN_METHOD(postFace: NSDictionary
 RCT_EXTERN_METHOD(confirm: (RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject
                   )
+RCT_EXTERN_METHOD(postAuthenticate: NSDictionary
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter: (RCTPromiseRejectBlock)reject
+                  )
 @end

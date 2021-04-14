@@ -33,11 +33,20 @@ const [hasCameraPermissions, setPermissions] = useState(undefined);
       { !hasCameraPermissions &&
         <Text> Please allow camera permissions </Text>
       }
-      <Button
-        disabled={!hasCameraPermissions}
-        title="Start Verification"
-        onPress={() => navigation.navigate('ID', { name: 'IDV' })}
-      />
+      <View style={styles.startButton}>
+        <Button
+          disabled={!hasCameraPermissions}
+          title="Start Verification"
+          onPress={() => navigation.navigate('ID', { name: 'IDV' })}
+        />
+      </View>
+      <View style={styles.startButton}>
+        <Button
+          disabled={!hasCameraPermissions}
+          title="Start Authentication"
+          onPress={() => navigation.navigate('AuthInput')}
+        />
+      </View>
     </View>
   );
 };
@@ -45,8 +54,13 @@ const [hasCameraPermissions, setPermissions] = useState(undefined);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexDirection: 'column',
     justifyContent: 'center',
-    flexDirection: 'column'
+    alignItems: 'center',
+  },
+  startButton: {
+    padding: '2.5%',
+    width: '75%'
   }
 });
 

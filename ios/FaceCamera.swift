@@ -15,7 +15,7 @@ class FaceCamera : BaseCamera {
     init(frame: CGRect) {
         super.init(frame: frame, position: .front)
                 
-        faceDetect = FaceDetect(options: FaceDetectOptionsBuilder().withLivenessMode(.distance).build())
+        faceDetect = FaceDetect(options: FaceDetectOptionsBuilder().withLivenessMode(toLiveness(currentLivenessMode)).build())
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -27,6 +27,10 @@ class FaceCamera : BaseCamera {
         runModel(onPixelBuffer: pixelBuffer)
     }
     
+    @objc override func start() {
+        faceDetect = FaceDetect(options: FaceDetectOptionsBuilder().withLivenessMode(toLiveness(currentLivenessMode)).build())
+        super.start()
+    }
     
     func toLiveness(_ livenessStr: String) -> LivenessMode {
         if livenessStr == "NONE" {
@@ -45,7 +49,7 @@ class FaceCamera : BaseCamera {
 
         if currentLivenessMode != livenessMode {
             currentLivenessMode = livenessMode
-            faceDetect = FaceDetect(options: FaceDetectOptionsBuilder().withLivenessMode(toLiveness(livenessMode)).build())
+            faceDetect = FaceDetect(options: FaceDetectOptionsBuilder().withLivenessMode(toLiveness(currentLivenessMode)).build())
         }
         
         let faecDetectResult = faceDetect.detect(pixelBuffer);

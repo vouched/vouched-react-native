@@ -5,15 +5,15 @@ import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.common.MapBuilder;
-import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
+import com.facebook.react.uimanager.ViewGroupManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
 
 import java.util.Map;
 
-public class VouchedIdManager extends SimpleViewManager<IdCameraView> {
-
+public class VouchedIdManager extends ViewGroupManager<IdCameraView> {
     public static final int COMMAND_ID_CAMERA_STOP = 15;
+    public static final int COMMAND_ID_CAMERA_START = 32;
 
     @NonNull
     @Override
@@ -24,8 +24,7 @@ public class VouchedIdManager extends SimpleViewManager<IdCameraView> {
     @NonNull
     @Override
     protected IdCameraView createViewInstance(@NonNull ThemedReactContext reactContext) {
-        IdCameraView view = new IdCameraView(reactContext, false);
-        view.setAutoFocus(true);
+        IdCameraView view = new IdCameraView(reactContext);
         return view;
     }
 
@@ -46,16 +45,20 @@ public class VouchedIdManager extends SimpleViewManager<IdCameraView> {
     @Override
     public Map<String, Integer> getCommandsMap() {
         return MapBuilder.of(
-                "stop",
-                COMMAND_ID_CAMERA_STOP
+                "stop", COMMAND_ID_CAMERA_STOP,
+                "restart", COMMAND_ID_CAMERA_START
         );
     }
 
     @Override
     public void receiveCommand(@NonNull IdCameraView root, int commandId, @Nullable ReadableArray args) {
-        if (COMMAND_ID_CAMERA_STOP == commandId) {
-            root.stop();
+        switch (commandId) {
+            case COMMAND_ID_CAMERA_STOP:
+                root.stop();
+                break;
+            case COMMAND_ID_CAMERA_START:
+                root.start();
+                break;
         }
     }
-
 }

@@ -18,5 +18,14 @@ class FaceCameraManager: RCTViewManager {
         camera.stop()
       }
     }
+    
+    @objc func restart(_ node: NSNumber) {
+      DispatchQueue.main.async {
+        let camera = self.bridge.uiManager.view(
+          forReactTag: node
+        ) as! FaceCamera
+        camera.start()
+      }
+    }
 }
 
