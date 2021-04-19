@@ -268,7 +268,7 @@ Note: shouldn't be POSTed until the step is `"POSTABLE"`
 
 ##### LivenessMode `String`
 
-`"DISTANCE"` | `"MOUTH_MOVEMENT"` | `"NONE"`
+`"DISTANCE"` | `"MOUTH_MOVEMENT"` | `"BLINKING"` | `"NONE"`
 
 ##### Step `String`
 
@@ -276,4 +276,4 @@ Note: shouldn't be POSTed until the step is `"POSTABLE"`
 
 ##### Instruction `String`
 
-`"ONLY_ONE"` | `"MOVE_CLOSER"` | `"MOVE_AWAY"` | `"HOLD_STEADY"` | `"OPEN_MOUTH"` | `"CLOSE_MOUTH"` | `"LOOK_FORWARD"`
+`"ONLY_ONE"` | `"MOVE_CLOSER"` | `"MOVE_AWAY"` | `"HOLD_STEADY"` | `"OPEN_MOUTH"` | `"CLOSE_MOUTH"` | `"LOOK_FORWARD"` | `"BLINK_EYES"`

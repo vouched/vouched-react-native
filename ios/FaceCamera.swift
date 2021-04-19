@@ -33,14 +33,18 @@ class FaceCamera : BaseCamera {
     }
     
     func toLiveness(_ livenessStr: String) -> LivenessMode {
-        if livenessStr == "NONE" {
+        switch(livenessStr) {
+        case "NONE":
             return .none
-        } else if livenessStr == "MOUTH_MOVEMENT" {
+        case "MOUTH_MOVEMENT":
             return .mouthMovement
-        } else if livenessStr == "DISTANCE" {
+        case "DISTANCE":
             return .distance
+        case "BLINKING":
+            return .blinking
+        default:
+            return .none
         }
-        return .distance
     }
     
     /** This method runs the live camera pixelBuffer through tensorFlow to get the result.

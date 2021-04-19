@@ -15,6 +15,8 @@ export const faceInstructionToLabel = (instruction, defaultVal) => {
             return 'Close Mouth'
         case "LOOK_FORWARD":
             return 'Look forward'
+        case "BLINK_EYES":
+            return 'Slowly Blink'
         default:
             return defaultVal || 'Unknown';
     }

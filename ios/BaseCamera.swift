@@ -127,6 +127,8 @@ extension BaseCamera: CameraFeedManagerDelegate {
             return "CLOSE_MOUTH"
         case .lookForward:
             return "LOOK_FORWARD"
+        case .blinkEyes:
+            return "BLINK_EYES"
         default:
             return ""
         }

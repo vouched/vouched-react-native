@@ -72,6 +72,7 @@ public class FaceCameraView extends ConstraintLayout implements LifecycleEventLi
             faceDetect = new FaceDetect(mThemedReactContext, new FaceDetectOptions.Builder().withLivenessMode(livenessMode).build(), this);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
+            faceDetect = new FaceDetect(mThemedReactContext, new FaceDetectOptions.Builder().withLivenessMode(LivenessMode.NONE).build(), this);
         }
 
     }

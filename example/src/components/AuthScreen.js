@@ -19,7 +19,7 @@ const AuthScreen = ({ navigation, route }) => {
       <View style={styles.camera}>
         <VouchedFaceCamera 
           ref={cameraRef}
-          livenessMode="NONE"
+          livenessMode="BLINKING"
           onFaceStream={async (faceDetectionResult) => {
             const { instruction, step } = faceDetectionResult;
 
