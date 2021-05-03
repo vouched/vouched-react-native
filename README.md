@@ -2,16 +2,18 @@
 
 [![npm version](https://img.shields.io/npm/v/@vouched.id/vouched-react-native.svg?style=flat-square)](https://www.npmjs.com/package/@vouched.id/vouched-react-native)
 
+## Get Started
+
+If this is your first time here, [Run the Example](#run-example) to get familiar.  
+If you're ready to add this to your existing project, [Install the Package](#install).
+
 ## Run Example
 
 Clone this repo and change directory to _example_
 
 ```shell
 git clone https://github.com/vouched/vouched-react-native
-```
-
-```shell
-cd example
+cd vouched-react-native/example
 ```
 
 Then, follow steps listed on the [example README](https://github.com/vouched/vouched-react-native/blob/master/example/README.md)
@@ -20,7 +22,7 @@ Then, follow steps listed on the [example README](https://github.com/vouched/vou
 
 - An account with Vouched
 - Your Vouched Public Key
-- Mobile Assets (available on the dashboard)
+- [Mobile Assets](https://github.com/vouched/vouched-react-native/blob/master/example/README.md#add-vouched-assets) (available on the dashboard)
 
 ## Install
 
@@ -41,6 +43,15 @@ iOS pods are not automatically installed, so we'll need to manually install them
 ```shell
  cd ios && pod install
 ```
+
+Ensure all [prerequisites](#prerequisites) have been met.
+
+## Create Verification Flow
+
+1. Determine the steps needed (ID, ID + Selfie, Authentication)
+2. Create the Component/Screen(s) for each step
+3. Use the appropriate Camera ([IdCamera](#idcamera) or [FaceCamera](#facecamera)) for the step.
+4. Ensure [session.confirm](#post-confirm-verification) is called once verification is complete to recieve finalized job data.
 
 ## Reference
 

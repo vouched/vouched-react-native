@@ -45,8 +45,8 @@ OR start Android Studio and run the app. This option may require you to reverse 
 adb -s YOUR_DEVICE_ID reverse tcp:8081 tcp:8081
 ```
 
-**Run on iOS**
+**Run on iOS**  
+Start Xcode and run the app.
 ```shell
-react-native run-ios --device "My iPhone"
+xed ios/example.xcworkspace
 ```
-OR start Xcode and run the app.
