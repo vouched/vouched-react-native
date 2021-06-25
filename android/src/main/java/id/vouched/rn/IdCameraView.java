@@ -1,6 +1,7 @@
 package id.vouched.rn;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Size;
@@ -17,8 +18,8 @@ import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LifecycleOwner;
 
-import com.facebook.react.ReactActivity;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.WritableMap;
@@ -34,11 +35,11 @@ import id.vouched.android.CardDetectResult;
 
 public class IdCameraView extends ConstraintLayout implements LifecycleEventListener, CardDetect.OnDetectResultListener {
     public static final String ON_ID_STREAM_EVENT = "onIdStream";
-    private static final Size DESIRED_PREVIEW_SIZE = new Size(960, 720);
+    private static final Size DESIRED_PREVIEW_SIZE = new Size(720, 1280);
 
     private final ThemedReactContext mThemedReactContext;
     private final CameraSelector cameraSelector;
-    private final ReactActivity activity;
+    private final Activity activity;
     private PreviewView previewView;
     private ProcessCameraProvider cameraProvider;
     private Preview previewUseCase;
@@ -56,7 +57,7 @@ public class IdCameraView extends ConstraintLayout implements LifecycleEventList
         super(themedReactContext);
 
         mThemedReactContext = themedReactContext;
-        activity = (ReactActivity) themedReactContext.getCurrentActivity();
+        activity = themedReactContext.getCurrentActivity();
         cardDetect = new CardDetect(themedReactContext.getAssets(), CardDetectOptions.defaultOptions(), this);
         cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build();
 
@@ -146,7 +147,7 @@ public class IdCameraView extends ConstraintLayout implements LifecycleEventList
         builder.setTargetResolution(DESIRED_PREVIEW_SIZE);
         previewUseCase = builder.build();
         previewUseCase.setSurfaceProvider(previewView.getSurfaceProvider());
-        cameraProvider.bindToLifecycle(activity, cameraSelector, previewUseCase);
+        cameraProvider.bindToLifecycle((LifecycleOwner) activity, cameraSelector, previewUseCase);
     }
 
     private void bindAnalysisUseCase() {
@@ -177,7 +178,7 @@ public class IdCameraView extends ConstraintLayout implements LifecycleEventList
                     }
                 });
 
-        cameraProvider.bindToLifecycle(activity, cameraSelector, analysisUseCase);
+        cameraProvider.bindToLifecycle((LifecycleOwner) activity, cameraSelector, analysisUseCase);
     }
 
     @Override

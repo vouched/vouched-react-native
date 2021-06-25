@@ -11,7 +11,7 @@ import com.facebook.react.uimanager.ViewManager;
 public class VouchedPackage implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-        return Arrays.<NativeModule>asList(new VouchedSessionModule(reactContext));
+        return Arrays.<NativeModule>asList(new VouchedSessionModule(reactContext), new VouchedUtilsModule(reactContext));
     }
 
     @Override

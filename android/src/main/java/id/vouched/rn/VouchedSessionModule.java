@@ -7,11 +7,14 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableType;
 
 import id.vouched.android.CardDetectResult;
 import id.vouched.android.FaceDetectResult;
 import id.vouched.android.VouchedSession;
+import id.vouched.android.VouchedSessionParameters;
 import id.vouched.android.model.AuthenticationResponse;
 import id.vouched.android.model.JobResponse;
 import id.vouched.android.model.Params;
@@ -38,12 +41,33 @@ public class VouchedSessionModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void configure(String apiKey) {
-        session = new VouchedSession(apiKey);
+    public void configure(String apiKey, ReadableMap sessionParams) {
+        VouchedSessionParameters.Builder builder = new VouchedSessionParameters.Builder()
+                .withCallbackURL(sessionParams.getString("callbackURL"))
+                .withGroupId(sessionParams.getString("groupId"));
+
+        ReadableArray properties = sessionParams.getArray("properties");
+        if (properties != null && properties.size() > 0) {
+            for (int i = 0; i < properties.size(); i++) {
+                if (ReadableType.Map.equals(properties.getType(i))) {
+                    ReadableMap map = properties.getMap(i);
+                    if (map != null) {
+                        String name = map.getString("name");
+                        String value = map.getString("value");
+                        if (name != null && value != null) {
+                            builder.addProperty(name, value);
+                        }
+                    }
+                }
+            }
+        }
+
+        VouchedSessionParameters vouchedSessionParameters = builder.build();
+        session = new VouchedSession(apiKey, vouchedSessionParameters);
     }
 
     @ReactMethod
-    public void postFrontId(ReadableMap detectResult, final Promise promise) {
+    public void postFrontId(ReadableMap detectResult, ReadableMap parameters, final Promise promise) {
         if (session == null) {
             promise.reject(SESSION_NOT_CONFIGURED, "session must be configured");
             return;
@@ -54,8 +78,14 @@ public class VouchedSessionModule extends ReactContextBaseJavaModule {
 
         CardDetectResult cardDetectResult = new CardDetectResult(null, null, image, distanceImage);
 
+        Params.Builder builder = new Params.Builder()
+                .withBirthDate(parameters.getString("birthDate"))
+                .withEmail(parameters.getString("email"))
+                .withFirstName(parameters.getString("firstName"))
+                .withLastName(parameters.getString("lastName"))
+                .withPhone(parameters.getString("phone"));
         try {
-            session.postFrontId(getReactApplicationContext(), cardDetectResult, new Params.Builder(), new VouchedSession.OnJobResponseListener() {
+            session.postFrontId(getReactApplicationContext(), cardDetectResult, builder, new VouchedSession.OnJobResponseListener() {
                 @Override
                 public void onJobResponse(JobResponse jobResponse) {
                     VouchedError jobError = jobResponse.getError();

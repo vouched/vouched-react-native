@@ -62,16 +62,17 @@ This class handles a user's Vouched session. It takes care of the API calls
 ##### Initialize a session
 
 ```javascript
-const session = new VouchedSession(apiKey);
+const session = new VouchedSession(apiKey, sessionParams);
 ```
+`Parameters` - String, [SessionParams](#sessionparams-object)
 
 ##### POST Front Id image
 
 ```javascript
-const job = await session.postFrontId(cardDetectionResult);
+const job = await session.postFrontId(cardDetectionResult, params);
 ```
 
-`Parameters` - [CardDetectResult](#carddetectresult-object)  
+`Parameters` - [CardDetectResult](#carddetectresult-object), [Params](#params-object)  
 `Returns` - [Job](#job-object)
 
 ##### POST Selfie image
@@ -104,6 +105,19 @@ const job = await session.confirm();
 
 `Returns` - [Job](#job-object)
 
+### VouchedUtils
+
+Utility class
+
+##### Extract Job Insights
+
+```javascript
+const insights = await VouchedUtils.extractInsights(job);
+```
+
+`Parameters` - [Job](#job-object)  
+`Returns` - [Insight](#insight-string)[]
+
 ### IdCamera
 
 Import and add to View
@@ -122,6 +136,8 @@ import { VouchedIdCamera } from '@vouched.id/vouched-react-native';
                 setMessage("Processing Image");
                 try {
                     let job = await session.postFrontId(cardDetectionResult);
+                    let insights = await VouchedUtils.extractInsights(job);
+                    // optionally retry based on insights
                     // proceed to next step
                 } catch (e) {
                     // handle error
@@ -168,6 +184,8 @@ import { VouchedFaceCamera } from '@vouched.id/vouched-react-native';
                 setMessage("Processing Image");
                 try {
                     let job = await session.postFrontId(faceDetectionResult);
+                    let insights = await VouchedUtils.extractInsights(job);
+                    // optionally retry based on insights
                     // proceed to next step
                 } catch (e) {
                     // handle error
@@ -230,8 +248,8 @@ Note: shouldn't be POSTed until the step is `"POSTABLE"`
 {
     "result": JobResult,
     "id": String,
-    "errors": [JobError],
-    "token": String
+    "errors": JobError[],
+    "token": String 
 }
 ```
 
@@ -239,13 +257,17 @@ Note: shouldn't be POSTed until the step is `"POSTABLE"`
 
 ```javascript
 {
+    "id": String?,
     "issueDate": String?,
     "country": String?,
     "confidences": JobConfidence,
     "expireDate": String?,
     "success": Boolean,
     "state": String?,
-    "lastName": String?
+    "lastName": String?,
+    "firstName": String?,
+    "birthDate": String?,
+    "type": String?
 }
 ```
 
@@ -253,10 +275,15 @@ Note: shouldn't be POSTed until the step is `"POSTABLE"`
 
 ```javascript
 {
-    "id": Number,
-    "faceMatch": Number,
-    "idGlareQuality": Number,
-    "idQuality": Number
+    "id": Number?,
+    "faceMatch": Number?,
+    "idGlareQuality": Number?,
+    "idQuality": Number?,
+    "idMatch": Number?,
+    "nameMatch": Number?,
+    "selfie": Number?,
+    "birthDateMatch": Number?,
+    "idQuality": Number?
 }
 ```
 
@@ -277,6 +304,37 @@ Note: shouldn't be POSTed until the step is `"POSTABLE"`
 }
 ```
 
+##### SessionParams `Object`
+
+```javascript
+{
+    "callbackURL": String?,
+    "groupId": String?,
+    "properties": Property[]?
+}
+```
+
+##### Property `Object`
+
+```javascript
+{
+    "name": String,
+    "value": String,
+}
+```
+
+##### Params `Object`
+
+```javascript
+{
+    "birthDate": String?,
+    "email": String?,
+    "firstName": String?,
+    "lastName": String?,
+    "phone": String?
+}
+```
+
 ##### LivenessMode `String`
 
 `"DISTANCE"` | `"MOUTH_MOVEMENT"` | `"BLINKING"` | `"NONE"`
@@ -287,4 +345,8 @@ Note: shouldn't be POSTed until the step is `"POSTABLE"`
 
 ##### Instruction `String`
 
-`"ONLY_ONE"` | `"MOVE_CLOSER"` | `"MOVE_AWAY"` | `"HOLD_STEADY"` | `"OPEN_MOUTH"` | `"CLOSE_MOUTH"` | `"LOOK_FORWARD"` | `"BLINK_EYES"`
+`"ONLY_ONE"` | `"MOVE_CLOSER"` | `"MOVE_AWAY"` | `"HOLD_STEADY"` | `"OPEN_MOUTH"` | `"CLOSE_MOUTH"` | `"LOOK_FORWARD"` | `"BLINK_EYES"` | `"NO_CARD"` | `"NO_FACE"`
+
+##### Insight `String`
+
+`"UNKNOWN"` | `"NON_GLARE"` | `"QUALITY"` | `"BRIGHTNESS"` | `"FACE"` | `"GLASSES"`

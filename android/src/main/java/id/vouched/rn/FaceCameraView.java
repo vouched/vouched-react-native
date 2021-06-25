@@ -1,6 +1,7 @@
 package id.vouched.rn;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.util.Size;
 import android.view.Choreographer;
 import android.view.LayoutInflater;
@@ -15,8 +16,8 @@ import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LifecycleOwner;
 
-import com.facebook.react.ReactActivity;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.WritableMap;
@@ -33,11 +34,11 @@ import id.vouched.android.liveness.LivenessMode;
 
 public class FaceCameraView extends ConstraintLayout implements LifecycleEventListener, FaceDetect.OnDetectResultListener {
     public static final String ON_FACE_STREAM_EVENT = "onFaceStream";
-    private static final Size DESIRED_PREVIEW_SIZE = new Size(960, 720);
+    private static final Size DESIRED_PREVIEW_SIZE = new Size(720, 1280);
 
     private final ThemedReactContext mThemedReactContext;
     private final CameraSelector cameraSelector;
-    private final ReactActivity activity;
+    private final Activity activity;
     private PreviewView previewView;
     private ProcessCameraProvider cameraProvider;
     private Preview previewUseCase;
@@ -52,7 +53,7 @@ public class FaceCameraView extends ConstraintLayout implements LifecycleEventLi
         super(themedReactContext);
 
         mThemedReactContext = themedReactContext;
-        activity = (ReactActivity) themedReactContext.getCurrentActivity();
+        activity = themedReactContext.getCurrentActivity();
         faceDetect = new FaceDetect(themedReactContext, FaceDetectOptions.defaultOptions(), this);
         cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_FRONT).build();
 
@@ -142,7 +143,7 @@ public class FaceCameraView extends ConstraintLayout implements LifecycleEventLi
         builder.setTargetResolution(DESIRED_PREVIEW_SIZE);
         previewUseCase = builder.build();
         previewUseCase.setSurfaceProvider(previewView.getSurfaceProvider());
-        cameraProvider.bindToLifecycle(activity, cameraSelector, previewUseCase);
+        cameraProvider.bindToLifecycle((LifecycleOwner) activity, cameraSelector, previewUseCase);
     }
 
     private void bindAnalysisUseCase() {
@@ -173,7 +174,7 @@ public class FaceCameraView extends ConstraintLayout implements LifecycleEventLi
                     }
                 });
 
-        cameraProvider.bindToLifecycle(activity, cameraSelector, analysisUseCase);
+        cameraProvider.bindToLifecycle((LifecycleOwner) activity, cameraSelector, analysisUseCase);
     }
 
     @Override

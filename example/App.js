@@ -15,7 +15,11 @@ import { initSession } from 'common/session';
 import { AUTH_BASE_COLOR } from 'common/colors';
 
 import { PUBLIC_KEY } from '@env'
-initSession(PUBLIC_KEY)
+
+const sessionParams = { 
+  properties: []
+};
+initSession(PUBLIC_KEY, sessionParams)
 
 const Stack = createStackNavigator();
 

@@ -2,8 +2,8 @@ import {VouchedSession } from '@vouched.id/vouched-react-native';
 
 let session;
 
-export const initSession = (apiKey) => {
-    session = new VouchedSession(apiKey);
+export const initSession = (apiKey, sessionParams) => {
+    session = new VouchedSession(apiKey, sessionParams);
 }
 
 export const getSession = () => {

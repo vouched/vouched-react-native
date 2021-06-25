@@ -67,18 +67,16 @@ repositories {
         // Android JSC is installed from npm
         url "$rootDir/../node_modules/jsc-android/dist"
     }
-    maven {
-        url "https://dl.bintray.com/vouched/maven/"
-    }
     google()
     jcenter()
+    mavenCentral()
 }
 
 dependencies {
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'  // From node_modules
 
-    implementation 'id.vouched.android:vouched-sdk:0.3.1'
+    implementation 'id.vouched.android:vouched-sdk:0.3.5'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 }
 

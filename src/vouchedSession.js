@@ -4,13 +4,13 @@ const VouchedSessionModule = NativeModules.VouchedSession || NativeModules.Vouch
 
 export class VouchedSession {
 
-    constructor(apiKey) {
-        VouchedSessionModule.configure(apiKey);
+    constructor(apiKey, sessionParams={}) {
+        VouchedSessionModule.configure(apiKey, sessionParams);
     }
 
-    async postFrontId(cardDetectionResult, paramaters) {
+    async postFrontId(cardDetectionResult, params={}) {
         try {
-            const res = await VouchedSessionModule.postFrontId(cardDetectionResult);
+            const res = await VouchedSessionModule.postFrontId(cardDetectionResult, params);
             return JSON.parse(res);
         } catch (e) {
             throw e

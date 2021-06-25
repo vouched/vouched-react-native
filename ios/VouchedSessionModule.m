@@ -2,8 +2,10 @@
 #import "React/RCTEventEmitter.h"
 
 @interface RCT_EXTERN_MODULE(VouchedSessionModule, NSObject)
-RCT_EXTERN_METHOD(configure: NSString)
+RCT_EXTERN_METHOD(configure: NSString
+                  sessionParams: NSDictionary)
 RCT_EXTERN_METHOD(postFrontId: NSDictionary
+                  parameters: NSDictionary
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject
                   )
