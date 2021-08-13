@@ -2,7 +2,7 @@
 
 import UIKit
 import VideoToolbox
-import Vouched
+import VouchedCore
 
 class FaceCamera : BaseCamera {
     
@@ -22,9 +22,9 @@ class FaceCamera : BaseCamera {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func didOutput(pixelBuffer: CVPixelBuffer) {
-        super.didOutput(pixelBuffer: pixelBuffer)
-        runModel(onPixelBuffer: pixelBuffer)
+    override func didOutput(sampleBuffer: CMSampleBuffer) {
+        super.didOutput(sampleBuffer: sampleBuffer)
+        runModel(onSampleBuffer: sampleBuffer)
     }
     
     @objc override func start() {
@@ -49,28 +49,27 @@ class FaceCamera : BaseCamera {
     
     /** This method runs the live camera pixelBuffer through tensorFlow to get the result.
      */
-    @objc func runModel(onPixelBuffer pixelBuffer: CVPixelBuffer) {
+    @objc func runModel(onSampleBuffer sampleBuffer: CMSampleBuffer) {
 
         if currentLivenessMode != livenessMode {
             currentLivenessMode = livenessMode
             faceDetect = FaceDetect(options: FaceDetectOptionsBuilder().withLivenessMode(toLiveness(currentLivenessMode)).build())
         }
         
-        let faecDetectResult = faceDetect.detect(pixelBuffer);
-        if faecDetectResult == nil {
-            onFaceStream!(["userDistanceImage": nil, "image": nil, "instruction" : "NO_FACE", "step": "PRE_DETECTED"]);
-        } else {
+        let faceDetectResult = faceDetect.detect(sampleBuffer);
+        if let faceDetectResult = faceDetectResult as? FaceDetectResult {
             onFaceStream!([
-                            "userDistanceImage": faecDetectResult?.distanceImage,
-                            "image": faecDetectResult?.image,
-                            "instruction" : toInstructionName(faecDetectResult!.instruction),
-                            "step": toStepName(faecDetectResult!.step)]
+                            "userDistanceImage": faceDetectResult.distanceImage,
+                            "image": faceDetectResult.image,
+                            "instruction" : toInstructionName(faceDetectResult.instruction),
+                            "step": toStepName(faceDetectResult.step)]
             );
-            if faecDetectResult!.step == Step.postable {
+            if faceDetectResult.step == Step.postable {
                 sleep(1)
             }
+        } else {
+            onFaceStream!(["userDistanceImage": nil, "image": nil, "instruction" : "NO_FACE", "step": "PRE_DETECTED"]);
         }
-        
         
     }
 }

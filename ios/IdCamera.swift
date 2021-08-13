@@ -2,7 +2,7 @@
 
 import UIKit
 import VideoToolbox
-import Vouched
+import VouchedCore
 
 class IdCamera : BaseCamera {
     
@@ -22,9 +22,9 @@ class IdCamera : BaseCamera {
         fatalError("init(coder:) has not been implemented")
     }
     
-    override func didOutput(pixelBuffer: CVPixelBuffer) {
-        super.didOutput(pixelBuffer: pixelBuffer)
-        runModel(onPixelBuffer: pixelBuffer)
+    override func didOutput(sampleBuffer: CMSampleBuffer) {
+        super.didOutput(sampleBuffer: sampleBuffer)
+        runModel(onSampleBuffer: sampleBuffer)
     }
     
     @objc override func start() {
@@ -34,27 +34,28 @@ class IdCamera : BaseCamera {
     
     /** This method runs the live camera pixelBuffer through tensorFlow to get the result.
      */
-    @objc func runModel(onPixelBuffer pixelBuffer: CVPixelBuffer) {
+    @objc func runModel(onSampleBuffer sampleBuffer: CMSampleBuffer) {
 
         if currentEnableDistanceCheck != enableDistanceCheck {
             currentEnableDistanceCheck = enableDistanceCheck
             cardDetect = CardDetect(options: CardDetectOptionsBuilder().withEnableDistanceCheck(currentEnableDistanceCheck).build())
         }
         
-        let cardDetectResult = cardDetect.detect(pixelBuffer);
-        if cardDetectResult == nil {
-            onIdStream!(["distanceImage": nil, "image": nil, "instruction" : "NO_CARD", "step": "PRE_DETECTED"]);
-        } else {
+        let cardDetectResult = cardDetect.detect(sampleBuffer);
+        if let cardDetectResult = cardDetectResult as? CardDetectResult {
             onIdStream!([
-                            "distanceImage": cardDetectResult?.distanceImage,
-                            "image": cardDetectResult?.image,
-                            "instruction" : toInstructionName(cardDetectResult!.instruction),
-                            "step": toStepName(cardDetectResult!.step)]
+                            "distanceImage": cardDetectResult.distanceImage,
+                            "image": cardDetectResult.image,
+                            "instruction" : toInstructionName(cardDetectResult.instruction),
+                            "step": toStepName(cardDetectResult.step)]
             );
-            if cardDetectResult!.step == Step.postable {
+            if cardDetectResult.step == Step.postable {
                 sleep(1)
             }
+        } else {
+            onIdStream!(["distanceImage": nil, "image": nil, "instruction" : "NO_CARD", "step": "PRE_DETECTED"]);
         }
+        
     }
 
 }

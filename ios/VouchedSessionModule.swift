@@ -1,4 +1,4 @@
-import Vouched
+import VouchedCore
 
 @objc(VouchedSessionModule)
 class VouchedSessionModule: NSObject {
@@ -33,12 +33,12 @@ class VouchedSessionModule: NSObject {
         let image: String? = strFromDict(detectResult, "image")
         let distanceImage: String? = strFromDict(detectResult, "distanceImage")
         
-        let cardDetectResult = CardDetectResult(image: image, distanceImage: distanceImage, step: .postable, instruction: .none);
+        let cardDetectResult = CardDetectResult(image: image, distanceImage: distanceImage, step: .postable, instruction: .none, boundingBox: nil);
 
         do {
             var job: Job?;
             if var params = try? DictionaryDecoder().decode(Params.self, from: handleDOB(parameters) as! [String : Any]) {
-                job = try session?.postFrontId(detectedCard: cardDetectResult, params: &params)
+                job = try session?.postFrontId(detectedCard: cardDetectResult, details: params)
             } else {
                 job = try session?.postFrontId(detectedCard: cardDetectResult)
             }

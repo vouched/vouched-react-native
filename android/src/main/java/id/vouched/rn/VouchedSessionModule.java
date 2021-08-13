@@ -76,7 +76,7 @@ public class VouchedSessionModule extends ReactContextBaseJavaModule {
         String distanceImage = detectResult.getString("distanceImage");
         String image = detectResult.getString("image");
 
-        CardDetectResult cardDetectResult = new CardDetectResult(null, null, image, distanceImage);
+        CardDetectResult cardDetectResult = new CardDetectResult(null, null, image, distanceImage, null, null);
 
         Params.Builder builder = new Params.Builder()
                 .withBirthDate(parameters.getString("birthDate"))

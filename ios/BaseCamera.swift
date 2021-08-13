@@ -3,7 +3,7 @@
 import UIKit
 import VideoToolbox
 import AVFoundation
-import Vouched
+import VouchedCore
 
 class BaseCamera : UIView {
     
@@ -79,7 +79,7 @@ class BaseCamera : UIView {
 // MARK: CameraFeedManagerDelegate Methods
 extension BaseCamera: CameraFeedManagerDelegate {
 
-    @objc func didOutput(pixelBuffer: CVPixelBuffer) {
+    @objc func didOutput(sampleBuffer: CMSampleBuffer) {
         if isStopped {
             return
         }

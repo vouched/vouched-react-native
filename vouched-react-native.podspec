@@ -19,5 +19,5 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.dependency "React"
-  s.dependency "Vouched", "0.6.2"
+  s.dependency "Vouched", "0.7.2"
 end

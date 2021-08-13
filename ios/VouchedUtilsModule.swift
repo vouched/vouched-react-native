@@ -1,4 +1,4 @@
-import Vouched
+import VouchedCore
 
 @objc(VouchedUtilsModule)
 class VouchedUtilsModule: NSObject {
