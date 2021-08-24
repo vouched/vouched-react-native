@@ -30,6 +30,7 @@ import java.util.concurrent.ExecutionException;
 import id.vouched.android.FaceDetect;
 import id.vouched.android.FaceDetectOptions;
 import id.vouched.android.FaceDetectResult;
+import id.vouched.android.Step;
 import id.vouched.android.liveness.LivenessMode;
 
 public class FaceCameraView extends ConstraintLayout implements LifecycleEventListener, FaceDetect.OnDetectResultListener {
@@ -192,6 +193,14 @@ public class FaceCameraView extends ConstraintLayout implements LifecycleEventLi
         mThemedReactContext
                 .getJSModule(RCTEventEmitter.class)
                 .receiveEvent(getId(), ON_FACE_STREAM_EVENT, event);
+
+        try {
+            if (faceDetectResult.getStep() == Step.POSTABLE) {
+                Thread.sleep(1000);
+            }
+        } catch (InterruptedException e) {
+            // do nothing
+        }
     }
 
     private void setupLayoutHack() {

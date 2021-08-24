@@ -32,6 +32,7 @@ import java.util.concurrent.ExecutionException;
 import id.vouched.android.CardDetect;
 import id.vouched.android.CardDetectOptions;
 import id.vouched.android.CardDetectResult;
+import id.vouched.android.Step;
 
 public class IdCameraView extends ConstraintLayout implements LifecycleEventListener, CardDetect.OnDetectResultListener {
     public static final String ON_ID_STREAM_EVENT = "onIdStream";
@@ -196,6 +197,14 @@ public class IdCameraView extends ConstraintLayout implements LifecycleEventList
         mThemedReactContext
                 .getJSModule(RCTEventEmitter.class)
                 .receiveEvent(getId(), ON_ID_STREAM_EVENT, event);
+
+        try {
+            if (cardDetectResult.getStep() == Step.POSTABLE) {
+                Thread.sleep(1000);
+            }
+        } catch (InterruptedException e) {
+            // do nothing
+        }
     }
 
     private void setupLayoutHack() {
