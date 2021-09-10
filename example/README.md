@@ -15,7 +15,7 @@ PUBLIC_KEY=
 Navigate to your Vouched Dashboard and download the Android and iOS assets.
 
 1. Unzip the Android assets and copy the assets directory to _android/app/src/main/assets/_
-2. Unzip the iOS assets and copy each file to _ios/example_. Double check **Copy Bundle Resources**
+2. Unzip the iOS assets and copy each file to _ios/example_. Double check to see if the assets exist in **Xcode - Build Phases - Copy Bundle Resources**. Else, add them manually. 
 
 ### Build
 
