@@ -33,6 +33,7 @@ import id.vouched.android.CardDetect;
 import id.vouched.android.CardDetectOptions;
 import id.vouched.android.CardDetectResult;
 import id.vouched.android.Step;
+import id.vouched.android.exception.VouchedAssetsMissingException;
 
 public class IdCameraView extends ConstraintLayout implements LifecycleEventListener, CardDetect.OnDetectResultListener {
     public static final String ON_ID_STREAM_EVENT = "onIdStream";
@@ -54,7 +55,7 @@ public class IdCameraView extends ConstraintLayout implements LifecycleEventList
     private boolean isRendered = false;
     private boolean isStopped = false;
 
-    public IdCameraView(@NonNull ThemedReactContext themedReactContext) {
+    public IdCameraView(@NonNull ThemedReactContext themedReactContext) throws VouchedAssetsMissingException {
         super(themedReactContext);
 
         mThemedReactContext = themedReactContext;
@@ -76,7 +77,7 @@ public class IdCameraView extends ConstraintLayout implements LifecycleEventList
         setupLayoutHack();
     }
 
-    public void setEnableDistanceCheck(boolean enableDistanceCheck) {
+    public void setEnableDistanceCheck(boolean enableDistanceCheck) throws VouchedAssetsMissingException {
         cardDetect = new CardDetect(mThemedReactContext.getAssets(), new CardDetectOptions.Builder().withEnableDistanceCheck(enableDistanceCheck).build(), this);
     }
 

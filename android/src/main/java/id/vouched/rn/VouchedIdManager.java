@@ -11,6 +11,8 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 
 import java.util.Map;
 
+import id.vouched.android.exception.VouchedAssetsMissingException;
+
 public class VouchedIdManager extends ViewGroupManager<IdCameraView> {
     public static final int COMMAND_ID_CAMERA_STOP = 15;
     public static final int COMMAND_ID_CAMERA_START = 32;
@@ -24,12 +26,17 @@ public class VouchedIdManager extends ViewGroupManager<IdCameraView> {
     @NonNull
     @Override
     protected IdCameraView createViewInstance(@NonNull ThemedReactContext reactContext) {
-        IdCameraView view = new IdCameraView(reactContext);
+        IdCameraView view = null;
+        try {
+            view = new IdCameraView(reactContext);
+        } catch (VouchedAssetsMissingException e) {
+            e.printStackTrace();
+        }
         return view;
     }
 
     @ReactProp(name = "enableDistanceCheck")
-    public void setEnableDistanceCheck(IdCameraView view, boolean enableDistanceCheck) {
+    public void setEnableDistanceCheck(IdCameraView view, boolean enableDistanceCheck) throws VouchedAssetsMissingException {
         view.setEnableDistanceCheck(enableDistanceCheck);
     }
 

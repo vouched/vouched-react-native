@@ -13,9 +13,9 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2C89CB9925D28799000B9602 /* labelmap_mobilenet_card.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2C89CB9725D28799000B9602 /* labelmap_mobilenet_card.txt */; };
 		2C89CB9A25D28799000B9602 /* inference_graph.tflite in Resources */ = {isa = PBXBuildFile; fileRef = 2C89CB9825D28799000B9602 /* inference_graph.tflite */; };
+		5542740426F9412F00EB451A /* Pods_example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02A805F6F1738E80BD39A78D /* Pods_example.framework */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		9DF7EDB42C5FD24CF6C03A91 /* Pods_example_exampleTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CED7D8D79EE3DC22F77239A /* Pods_example_exampleTests.framework */; };
-		D6843C197E77B6ED4A8067A2 /* Pods_example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 02A805F6F1738E80BD39A78D /* Pods_example.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +45,7 @@
 		2C89CB9825D28799000B9602 /* inference_graph.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; name = inference_graph.tflite; path = example/inference_graph.tflite; sourceTree = "<group>"; };
 		2CED7D8D79EE3DC22F77239A /* Pods_example_exampleTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_example_exampleTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A5287AEA4D24BF542D48B63 /* Pods-example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-example.release.xcconfig"; path = "Target Support Files/Pods-example/Pods-example.release.xcconfig"; sourceTree = "<group>"; };
+		5542756C26F9539900EB451A /* Sentry.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Sentry.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		726E1D7116D61BAA0E895A85 /* Pods-example-exampleTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-example-exampleTests.debug.xcconfig"; path = "Target Support Files/Pods-example-exampleTests/Pods-example-exampleTests.debug.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = example/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A268896A48EE61200DE510A2 /* Pods-example-exampleTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-example-exampleTests.release.xcconfig"; path = "Target Support Files/Pods-example-exampleTests/Pods-example-exampleTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -65,7 +66,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D6843C197E77B6ED4A8067A2 /* Pods_example.framework in Frameworks */,
+				5542740426F9412F00EB451A /* Pods_example.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -108,6 +109,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5542756C26F9539900EB451A /* Sentry.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
 				02A805F6F1738E80BD39A78D /* Pods_example.framework */,
@@ -301,10 +303,12 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-example/Pods-example-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Sentry/Sentry.framework",
 				"${PODS_ROOT}/Vouched/VouchedMobileSDK/VouchedCore.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sentry.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VouchedCore.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -359,10 +363,12 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-example-exampleTests/Pods-example-exampleTests-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Sentry/Sentry.framework",
 				"${PODS_ROOT}/Vouched/VouchedMobileSDK/VouchedCore.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Sentry.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VouchedCore.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;

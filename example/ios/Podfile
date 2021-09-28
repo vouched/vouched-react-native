@@ -23,3 +23,18 @@ target 'example' do
 #    flipper_post_install(installer)
 #  end
 end
+
+dynamic_frameworks = ['Sentry']
+# Make all the other frameworks into dynamic frameworks by overriding the dynamic_framework? function to return true
+pre_install do |installer|
+  installer.pod_targets.each do |pod|
+    if dynamic_frameworks.include?(pod.name)
+      def pod.dynamic_framework?;
+        true
+      end
+      def pod.build_type;
+        Pod::BuildType.dynamic_framework
+      end
+    end
+  end
+end
