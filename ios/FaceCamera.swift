@@ -55,20 +55,23 @@ class FaceCamera : BaseCamera {
             currentLivenessMode = livenessMode
             faceDetect = FaceDetect(options: FaceDetectOptionsBuilder().withLivenessMode(toLiveness(currentLivenessMode)).build())
         }
-        
-        let faceDetectResult = faceDetect.detect(sampleBuffer);
-        if let faceDetectResult = faceDetectResult as? FaceDetectResult {
-            onFaceStream!([
-                            "userDistanceImage": faceDetectResult.distanceImage,
-                            "image": faceDetectResult.image,
-                            "instruction" : toInstructionName(faceDetectResult.instruction),
-                            "step": toStepName(faceDetectResult.step)]
-            );
-            if faceDetectResult.step == Step.postable {
-                sleep(1)
+        do {
+            let faceDetectResult = try faceDetect.detect(sampleBuffer);
+            if let faceDetectResult = faceDetectResult as? FaceDetectResult {
+                onFaceStream!([
+                                "userDistanceImage": faceDetectResult.distanceImage,
+                                "image": faceDetectResult.image,
+                                "instruction" : toInstructionName(faceDetectResult.instruction),
+                                "step": toStepName(faceDetectResult.step)]
+                );
+                if faceDetectResult.step == Step.postable {
+                    sleep(1)
+                }
+            } else {
+                onFaceStream!(["userDistanceImage": nil, "image": nil, "instruction" : "NO_FACE", "step": "PRE_DETECTED"]);
             }
-        } else {
-            onFaceStream!(["userDistanceImage": nil, "image": nil, "instruction" : "NO_FACE", "step": "PRE_DETECTED"]);
+        } catch {
+            NSLog("An error occured during face detection: \(error)")
         }
         
     }

@@ -41,19 +41,24 @@ class IdCamera : BaseCamera {
             cardDetect = CardDetect(options: CardDetectOptionsBuilder().withEnableDistanceCheck(currentEnableDistanceCheck).build())
         }
         
-        let cardDetectResult = cardDetect.detect(sampleBuffer);
-        if let cardDetectResult = cardDetectResult as? CardDetectResult {
-            onIdStream!([
-                            "distanceImage": cardDetectResult.distanceImage,
-                            "image": cardDetectResult.image,
-                            "instruction" : toInstructionName(cardDetectResult.instruction),
-                            "step": toStepName(cardDetectResult.step)]
-            );
-            if cardDetectResult.step == Step.postable {
-                sleep(1)
+        do {
+            let cardDetectResult = try cardDetect.detect(sampleBuffer);
+            if let cardDetectResult = cardDetectResult as? CardDetectResult {
+                onIdStream!([
+                                "distanceImage": cardDetectResult.distanceImage,
+                                "image": cardDetectResult.image,
+                                "instruction" : toInstructionName(cardDetectResult.instruction),
+                                "step": toStepName(cardDetectResult.step)]
+                );
+                if cardDetectResult.step == Step.postable {
+                    sleep(1)
+                }
+            } else {
+                onIdStream!(["distanceImage": nil, "image": nil, "instruction" : "NO_CARD", "step": "PRE_DETECTED"]);
             }
-        } else {
-            onIdStream!(["distanceImage": nil, "image": nil, "instruction" : "NO_CARD", "step": "PRE_DETECTED"]);
+        }
+        catch {
+            NSLog("An error occured during id detection: \(error)")
         }
         
     }
