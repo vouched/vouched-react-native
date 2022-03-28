@@ -42,11 +42,11 @@ class IdCamera : BaseCamera {
         }
         
         do {
-            let cardDetectResult = try cardDetect.detect(sampleBuffer);
+            let cardDetectResult = try cardDetect.detect(sampleBuffer)
             if let cardDetectResult = cardDetectResult as? CardDetectResult {
+                let result = String(data: try JSONEncoder().encode(cardDetectResult), encoding: .utf8)
                 onIdStream!([
-                                "distanceImage": cardDetectResult.distanceImage,
-                                "image": cardDetectResult.image,
+                                "result": result!,
                                 "instruction" : toInstructionName(cardDetectResult.instruction),
                                 "step": toStepName(cardDetectResult.step)]
                 );
@@ -54,7 +54,7 @@ class IdCamera : BaseCamera {
                     sleep(1)
                 }
             } else {
-                onIdStream!(["distanceImage": nil, "image": nil, "instruction" : "NO_CARD", "step": "PRE_DETECTED"]);
+                onIdStream!(["result": nil, "instruction" : "NO_CARD", "step": "PRE_DETECTED"])
             }
         }
         catch {

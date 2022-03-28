@@ -30,22 +30,25 @@ class VouchedSessionModule: NSObject {
             return;
         }
         
-        let image: String? = strFromDict(detectResult, "image")
-        let distanceImage: String? = strFromDict(detectResult, "distanceImage")
-        
-        let cardDetectResult = CardDetectResult(image: image, distanceImage: distanceImage, step: .postable, instruction: .none, boundingBox: nil);
-
         do {
-            var job: Job?;
-            if var params = try? DictionaryDecoder().decode(Params.self, from: handleDOB(parameters) as! [String : Any]) {
-                job = try session?.postFrontId(detectedCard: cardDetectResult, details: params)
+            let cardDetectResult: CardDetectResult
+            if let result = detectResult["result"] as? String {
+                cardDetectResult = try JSONDecoder().decode(CardDetectResult.self, from: Data(result.utf8))
             } else {
-                job = try session?.postFrontId(detectedCard: cardDetectResult)
+                cardDetectResult = CardDetectResult(image: nil, distanceImage: nil, step: .postable, instruction: .none, boundingBox: nil)
+            }
+
+            var job: Job?
+            if let params = try? DictionaryDecoder().decode(Params.self, from: handleDOB(parameters) as! [String : Any]) {
+                job = try session?.postCardId(detectedCard: cardDetectResult, details: params)
+            } else {
+                job = try session?.postCardId(detectedCard: cardDetectResult)
             }
             
             let jobString = convertObjToString(job!)
             resolve(jobString)
         } catch {
+            print("\(error)")
             reject(VouchedSessionModule.POST_FRONT_ID_FAIL, error.localizedDescription, error)
         }
         
@@ -58,12 +61,14 @@ class VouchedSessionModule: NSObject {
             return;
         }
         
-        let image: String? = strFromDict(detectResult, "image")
-        let distanceImage: String? = strFromDict(detectResult, "userDistanceImage")
-        
-        let faceDetectResult = FaceDetectResult(image: image, distanceImage: distanceImage, step: .postable, instruction: .none);
-
         do {
+            let faceDetectResult: FaceDetectResult
+            if let result = detectResult["result"] as? String {
+                faceDetectResult = try JSONDecoder().decode(FaceDetectResult.self, from: Data(result.utf8))
+            } else {
+                faceDetectResult = FaceDetectResult(image: nil, distanceImage: nil, step: .postable, instruction: .none)
+            }
+            
             let job = try session?.postFace(detectedFace: faceDetectResult)
             let jobString = convertObjToString(job!)
             resolve(jobString)
@@ -148,7 +153,7 @@ class VouchedSessionModule: NSObject {
         }
         return nil;
     }
-    
+
     private func convertObjToString<T>(_ obj: T) -> String? where T: Encodable {
         do {
             return String(data: try JSONEncoder().encode(obj), encoding: .utf8)!

@@ -58,9 +58,9 @@ class FaceCamera : BaseCamera {
         do {
             let faceDetectResult = try faceDetect.detect(sampleBuffer);
             if let faceDetectResult = faceDetectResult as? FaceDetectResult {
+                let result = String(data: try JSONEncoder().encode(faceDetectResult), encoding: .utf8)
                 onFaceStream!([
-                                "userDistanceImage": faceDetectResult.distanceImage,
-                                "image": faceDetectResult.image,
+                                "result": result!,
                                 "instruction" : toInstructionName(faceDetectResult.instruction),
                                 "step": toStepName(faceDetectResult.step)]
                 );
@@ -68,7 +68,7 @@ class FaceCamera : BaseCamera {
                     sleep(1)
                 }
             } else {
-                onFaceStream!(["userDistanceImage": nil, "image": nil, "instruction" : "NO_FACE", "step": "PRE_DETECTED"]);
+                onFaceStream!(["result": nil, "instruction" : "NO_FACE", "step": "PRE_DETECTED"]);
             }
         } catch {
             NSLog("An error occured during face detection: \(error)")

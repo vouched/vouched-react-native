@@ -35,6 +35,8 @@ target 'example' do
             end 
        end
      end
+    # see https://github.com/facebook/react-native/issues/33174#issuecomment-1064081540
+    react_native_post_install(installer)
+    __apply_Xcode_12_5_M1_post_install_workaround(installer)
    end
 end
-
