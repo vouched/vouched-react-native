@@ -59,5 +59,5 @@ Start Xcode and run the app.
 xed ios/example.xcworkspace
 ```
 
-You will need to assign a bundle id and a developer account
+You will need to assign a bundle id and a related developer account within Xcode to run on an iOS device
 
