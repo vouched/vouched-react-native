@@ -76,7 +76,7 @@ dependencies {
     //noinspection GradleDynamicVersion
     implementation 'com.facebook.react:react-native:+'  // From node_modules
 
-    implementation 'id.vouched.android:vouched-sdk:0.6.8'
+    implementation 'id.vouched.android:vouched-sdk:0.7.0'
     implementation 'com.google.mlkit:face-detection:16.1.2'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 }

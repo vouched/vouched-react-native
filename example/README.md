@@ -14,13 +14,6 @@ Create .env in the root of the _example_ directory, replacing <PUBLIC_KEY> with 
 PUBLIC_KEY=<PUBLIC_KEY>
 ```
 
-### Add Vouched Assets
-
-Navigate to your Vouched Dashboard and download the Android and iOS assets.
-
-1. Unzip the Android assets. Create a directory at _example/android/app/src/main/assets_ and copy the asset files to that directory
-2. Unzip the iOS assets and copy each file in the card_detect folder to the _example/ios/example_ directory.  Click on the Vouched project, and verify that the assets exist in the **Build Phases** tab, in the **Copy Bundle Resources** section. If not, add them using the + button in that section .
-
 ### Build
 
 ```shell
