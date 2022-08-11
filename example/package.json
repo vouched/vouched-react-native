@@ -12,7 +12,7 @@
     "@react-native-community/masked-view": "^0.1.10",
     "@react-navigation/native": "^5.9.2",
     "@react-navigation/stack": "^5.14.2",
-    "@vouched.id/vouched-react-native": "0.6.0",
+    "@vouched.id/vouched-react-native": "1.0.0",
     "patch-package": "^6.4.7",
     "react": "16.13.0",
     "react-native": "0.67.2",

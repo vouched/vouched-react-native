@@ -13,7 +13,7 @@ const AuthInputScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
-        <Text style={{ color: 'white' }}> Enter the Vouched job id to authenticate </Text>
+        <Text style={{ color: 'white' }}> Enter the Vouched job id to re-verify </Text>
         <TextInput
           style={styles.input}
           autoCapitalize='none'

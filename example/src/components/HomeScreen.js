@@ -7,7 +7,7 @@ const HomeScreen = ({ navigation }) => {
 const [hasCameraPermissions, setPermissions] = useState(undefined);
 
   useEffect(() => {
-    // assume all iOS users except permissions
+    // assume all iOS users accept permissions
     if (Platform.OS === 'ios') {
         setPermissions(true);
         return;
@@ -43,7 +43,7 @@ const [hasCameraPermissions, setPermissions] = useState(undefined);
       <View style={styles.startButton}>
         <Button
           disabled={!hasCameraPermissions}
-          title="Start Authentication"
+          title="Start Re-verification"
           onPress={() => navigation.navigate('AuthInput')}
         />
       </View>

@@ -6,6 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import HomeScreen from 'components/HomeScreen';
 import IDScreen from 'components/IDScreen';
+import BackIDScreen from 'components/BackIDScreen';
 import FaceScreen from 'components/FaceScreen';
 import DoneScreen from 'components/DoneScreen';
 import AuthScreen from 'components/AuthScreen';
@@ -67,6 +68,11 @@ const App = () => {
         <Stack.Screen
           name="ID"
           component={IDScreen}
+          options={{ headerLeft: null }}
+        />
+        <Stack.Screen
+          name="BackID"
+          component={BackIDScreen}
           options={{ headerLeft: null }}
         />
         <Stack.Screen

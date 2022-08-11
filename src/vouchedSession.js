@@ -16,6 +16,15 @@ export class VouchedSession {
             throw e
         }
     }
+
+    async postBackId(cardDetectionResult) {
+        try {
+            const res = await VouchedSessionModule.postBackId(cardDetectionResult);
+            return JSON.parse(res);
+        } catch (e) {
+            throw e
+        }
+    }
     
     async postFace(faceDetectionResult) {
         try {
@@ -35,12 +44,11 @@ export class VouchedSession {
         }
     }
 
-    async postAuthenticate(faceDetectionResult, jobId, matchId) {
+    async postReverify(faceDetectionResult, jobId) {
         try {
-            const res = await VouchedSessionModule.postAuthenticate({
-                image: faceDetectionResult.image,
-                jobId,
-                matchId
+            const res = await VouchedSessionModule.postReverify({
+                faceDetectionResult,
+                jobId
             });
             return JSON.parse(res);
         } catch (e) {

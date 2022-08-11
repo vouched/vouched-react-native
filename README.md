@@ -47,7 +47,12 @@ Ensure all [prerequisites](#prerequisites) have been met.
 
 ## Create Verification Flow
 
-1. Determine the steps needed (ID, ID + Selfie, Authentication)
+Note: Be sure to review the IDScreen, BackIDScreen and FaceScreen in 
+the example app to get a sense of possible behaviors you can use in
+your app's verification flow. Some IDs require processing both front 
+and back sides.
+
+1. Determine the steps needed (ID, ID + Selfie, Reverification)
 2. Create the Component/Screen(s) for each step
 3. Use the appropriate Camera ([IdCamera](#idcamera) or [FaceCamera](#facecamera)) for the step.
 4. Ensure [session.confirm](#post-confirm-verification) is called once verification is complete to recieve finalized job data.
@@ -74,6 +79,15 @@ const job = await session.postFrontId(cardDetectionResult, params);
 `Parameters` - [CardDetectResult](#carddetectresult-object), [Params](#params-object)  
 `Returns` - [Job](#job-object)
 
+##### POST Back Id image
+
+```javascript
+const job = await session.postBackId(cardDetectionResult, params);
+```
+
+`Parameters` - [CardDetectResult](#carddetectresult-object), [Params](#params-object)
+`Returns` - [Job](#job-object)
+
 ##### POST Selfie image
 
 ```javascript
@@ -83,18 +97,17 @@ const job = await session.postFace(faceDetectionResult);
 `Parameters` - [FaceDetectResult](#facedetectresult-object)  
 `Returns` - [Job](#job-object)
 
-##### POST Authentication
+##### POST Re-verification
 
 ```javascript
-const authResult = await session.postAuthenticate(
+const authResult = await session.postReverify(
   faceDetectionResult,
-  jobId,
-  matchId
+  jobId
 );
 ```
 
 `Parameters` - [FaceDetectResult](#facedetectresult-object), String, Boolean  
-`Returns` - [AuthenticateResult](#authenticateresult-object)
+`Returns` - [Job](#job-object)
 
 ##### POST confirm verification
 

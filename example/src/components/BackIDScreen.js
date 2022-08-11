@@ -5,10 +5,9 @@ import Footer from 'components/Footer';
 import { VouchedIdCamera, VouchedUtils } from '@vouched.id/vouched-react-native';
 import { getSession} from '../common/session'
 
-const IDScreen = ({ navigation, route }) => {
+const BackIDScreen = ({ navigation, route }) => {
   const cameraRef = useRef(null);
   const [message, setMessage] = useState('loading...');
-  const [nextScreen, setNextScreen] = useState('Face')
   const [showNextButton, setShowNextButton] = useState(false);
   const [session] = useState(getSession());
   const [params] = useState({});
@@ -44,9 +43,8 @@ const IDScreen = ({ navigation, route }) => {
               cameraRef.current.stop();
               setMessage("Processing");
               try {
-                let job = await session.postFrontId(cardDetectionResult, params);
+                let job = await session.postBackId(cardDetectionResult, params);
                 let insights = await VouchedUtils.extractInsights(job);
-
                 if (insights != null && insights.length > 0) {
                   setMessage(messageByInsight(insights[0]));
                   setTimeout(() => {
@@ -54,10 +52,6 @@ const IDScreen = ({ navigation, route }) => {
                   }, 5000);
                 } else {
                   setMessage("Please continue to next step");
-                  if (job.result.captureBackId == true) {
-                    setMessage("Flip ID over to scan back of ID");  
-                    setNextScreen('BackID');
-                  } 
                   setShowNextButton(true);
                 }
               } catch (e) {
@@ -71,7 +65,7 @@ const IDScreen = ({ navigation, route }) => {
       </View>
       { showNextButton &&
         <View style={styles.nextButton}>
-          <Button title="Next Step" onPress={() => navigation.navigate(`${nextScreen}`)} />
+          <Button title="Next Step: Face" onPress={() => navigation.navigate('Face')} />
         </View>
       }
       <Footer message={message} showHome={true} navigation={navigation} />
@@ -95,4 +89,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default IDScreen;
+export default BackIDScreen;

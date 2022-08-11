@@ -3,6 +3,7 @@ package id.vouched.rn;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.facebook.react.bridge.NativeMap;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -10,6 +11,8 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
+
+import java.util.Map;
 
 import id.vouched.android.CardDetectResult;
 import id.vouched.android.FaceDetectResult;
@@ -24,9 +27,10 @@ public class VouchedSessionModule extends ReactContextBaseJavaModule {
 
     private static final String SESSION_NOT_CONFIGURED = "SESSION_NOT_CONFIGURED";
     private static final String POST_FRONT_ID_FAIL = "POST_FRONT_ID_FAIL";
+    private static final String POST_BACK_ID_FAIL = "POST_BACK_ID_FAIL";
     private static final String POST_FACE_FAIL = "POST_FACE_FAIL";
     private static final String CONFIRM_FAIL = "CONFIRM_FAIL";
-    private static final String POST_AUTHENTICATE_FAIL = "POST_AUTHENTICATE_FAIL";
+    private static final String POST_REVERIFY_FAIL = "POST_REVERIFY_FAIL";
 
     private VouchedSession session;
 
@@ -102,6 +106,35 @@ public class VouchedSessionModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void postBackId(ReadableMap detectResult, final Promise promise) {
+        if (session == null) {
+            promise.reject(SESSION_NOT_CONFIGURED, "session must be configured");
+            return;
+        }
+
+        String distanceImage = detectResult.getString("distanceImage");
+        String image = detectResult.getString("image");
+
+        CardDetectResult cardDetectResult = new CardDetectResult(null, null, image, distanceImage, null, null);
+
+        try {
+            session.postBackId(getReactApplicationContext(), cardDetectResult, new Params.Builder(), new VouchedSession.OnJobResponseListener() {
+                @Override
+                public void onJobResponse(JobResponse jobResponse) {
+                    VouchedError jobError = jobResponse.getError();
+                    if (jobError != null) {
+                        promise.reject(POST_BACK_ID_FAIL, jobError.getMessage());
+                    } else {
+                        promise.resolve(jobResponse.getJob().toJson());
+                    }
+                }
+            });
+        } catch (Exception e) {
+            promise.reject(e);
+        }
+    }
+
+    @ReactMethod
     public void postFace(ReadableMap detectResult, final Promise promise) {
         if (session == null) {
             promise.reject(SESSION_NOT_CONFIGURED, "session must be configured");
@@ -131,32 +164,28 @@ public class VouchedSessionModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void postAuthenticate(ReadableMap authRequest, final Promise promise) {
-
+    public void postReverify(ReadableMap detectResult, final Promise promise) {
         if (session == null) {
             promise.reject(SESSION_NOT_CONFIGURED, "session must be configured");
             return;
         }
 
-        String image = authRequest.getString("image");
-        String jobId = authRequest.getString("jobId");
-        boolean matchId = authRequest.getBoolean("matchId");
-
-        FaceDetectResult faceDetectResult = new FaceDetectResult(null, null, image, null);
+        String jobId = detectResult.getString("jobId");
+        ReadableMap faceDetection = detectResult.getMap("faceDetectionResult");
+        String userPhoto = faceDetection.getString("image");
 
         try {
-            session.postAuthenticate(getReactApplicationContext(), jobId, faceDetectResult, matchId, new VouchedSession.OnAuthenticationResponseListener() {
+            session.postReverification(getReactApplicationContext(), jobId, userPhoto, new Params.Builder(), new VouchedSession.OnJobResponseListener() {
                 @Override
-                public void onAuthenticationResponse(AuthenticationResponse response) {
-                    VouchedError vouchedError = response.getError();
-                    if (vouchedError != null) {
-                        promise.reject(POST_AUTHENTICATE_FAIL, vouchedError.getMessage());
+                public void onJobResponse(JobResponse jobResponse) {
+                    VouchedError jobError = jobResponse.getError();
+                    if (jobError != null) {
+                        promise.reject(POST_REVERIFY_FAIL, jobError.getMessage());
                     } else {
-                        promise.resolve(response.getResult().toJson());
+                        promise.resolve(jobResponse.getJob().toJson());
                     }
                 }
             });
-
         } catch (Exception e) {
             promise.reject(e);
         }

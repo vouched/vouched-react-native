@@ -27,16 +27,15 @@ const AuthScreen = ({ navigation, route }) => {
               cameraRef.current.stop();
               setMessage("Processing");
               try {
-                const authResult = await session.postAuthenticate(faceDetectionResult, jobId, matchId);
-                if (authResult.match < 0.9) {
-                  setMessage("Unable to Authenticate. Please try again");
-                  setShowTryAgain(true);
+                let authResult = await session.postReverify(faceDetectionResult, jobId);
+                if (authResult.result.success == true) {
+                  setMessage("Successfully reverified. Please continue to next step");  
                 } else {
-                  setMessage("Authenticated. Please continue to next step");
+                  setMessage("Unable to Reverify. Please try again");
+                  setShowTryAgain(true);
                 }
               } catch (e) {
-                console.error(e)
-                setMessage("Unable to Authenticate. Please try again");
+                setMessage("Unable to Reverify. Please check the job ID and try again");
                 setShowTryAgain(true);
               }           
             } else {

@@ -53,6 +53,31 @@ class VouchedSessionModule: NSObject {
         }
         
     }
+
+    @objc func postBackId(_ detectResult: NSDictionary, resolver resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
+        
+        if session == nil {
+            reject(VouchedSessionModule.SESSION_NOT_CONFIGURED, "session must be configured", nil);
+            return;
+        }
+        
+        do {
+            let cardDetectResult: CardDetectResult
+            if let result = detectResult["result"] as? String {
+                cardDetectResult = try JSONDecoder().decode(CardDetectResult.self, from: Data(result.utf8))
+            } else {
+                cardDetectResult = CardDetectResult(image: nil, distanceImage: nil, step: .postable, instruction: .none, boundingBox: nil)
+            }
+
+            let job = try session?.postCardId(detectedCard: cardDetectResult, isFront: false)
+            let jobString = convertObjToString(job!)
+            resolve(jobString)
+        } catch {
+            print("\(error)")
+            reject(VouchedSessionModule.POST_FRONT_ID_FAIL, error.localizedDescription, error)
+        }
+        
+    }
     
     @objc func postFace(_ detectResult: NSDictionary, resolver resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
         
@@ -63,6 +88,7 @@ class VouchedSessionModule: NSObject {
         
         do {
             let faceDetectResult: FaceDetectResult
+
             if let result = detectResult["result"] as? String {
                 faceDetectResult = try JSONDecoder().decode(FaceDetectResult.self, from: Data(result.utf8))
             } else {
@@ -95,32 +121,33 @@ class VouchedSessionModule: NSObject {
         
     }
     
-    @objc func postAuthenticate(_ authRequest: NSDictionary, resolver resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
+    @objc func postReverify(_ detectResult: NSDictionary, resolver resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
         
         if session == nil {
             reject(VouchedSessionModule.SESSION_NOT_CONFIGURED, "session must be configured", nil);
             return;
         }
-        
-        let image: String? = strFromDict(authRequest, "image")
-        let jobId: String? = strFromDict(authRequest, "jobId")
-        
-        var matchId: Bool? = nil
-        let m = authRequest["matchId"]
-        if m is NSNumber {
-            matchId = (m as! NSNumber) == 1
-        }
 
-        if image == nil {
-            reject(VouchedSessionModule.POST_AUTHENTICATE_FAIL, "Unable to authenticate without an image.", nil)
-            return
-        } else if jobId == nil {
-            reject(VouchedSessionModule.POST_AUTHENTICATE_FAIL, "Unable to authenticate without a job id.", nil)
-            return
-        }
+        // unpack the dict we passed in
+        let jobId = detectResult["jobId"]
+        let faceDetectDict = detectResult["faceDetectionResult"] as! NSMutableDictionary
         
         do {
-            let auth = try session?.postAuthenticate(id: jobId!, userPhoto: image!, matchId: matchId)
+            let faceDetectResult: FaceDetectResult
+            if let result = faceDetectDict["result"] as? String {
+                faceDetectResult = try JSONDecoder().decode(FaceDetectResult.self, from: Data(result.utf8))
+            } else {
+                faceDetectResult = FaceDetectResult(image: nil, distanceImage: nil, step: .postable, instruction: .none)
+            }
+
+        if faceDetectResult.image == nil {
+            reject(VouchedSessionModule.POST_AUTHENTICATE_FAIL, "Unable to reverify without an image.", nil)
+            return
+        } else if jobId == nil {
+            reject(VouchedSessionModule.POST_AUTHENTICATE_FAIL, "Unable to reverify without a job id.", nil)
+            return
+        }
+            let auth = try session?.postReverify(jobId: jobId! as! String, userPhoto: faceDetectResult.image!)
             let authString = convertObjToString(auth!)
             resolve(authString)
         } catch {
