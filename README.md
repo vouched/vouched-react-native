@@ -99,14 +99,19 @@ const job = await session.postFace(faceDetectionResult);
 
 ##### POST Re-verification
 
+Reverification requires a job ID to match against, and photoType of "selfie" or "id",
+which indicates whether to match the reverification selfie against the original selfie
+or photo ID
+
 ```javascript
 const authResult = await session.postReverify(
   faceDetectionResult,
-  jobId
+  jobId,
+  photoType
 );
 ```
 
-`Parameters` - [FaceDetectResult](#facedetectresult-object), String, Boolean  
+`Parameters` - [FaceDetectResult](#facedetectresult-object), String, String  
 `Returns` - [Job](#job-object)
 
 ##### POST confirm verification

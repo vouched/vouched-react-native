@@ -8,7 +8,9 @@ import { faceInstructionToLabel } from '../common/labels'
 import { AUTH_BASE_COLOR } from 'common/colors';
 
 const AuthScreen = ({ navigation, route }) => {
-  const { jobId, matchId } = route.params;
+  // re-verify against the selfie or id in the referenced job
+  const matchType = "selfie";
+  const { jobId } = route.params;
   const cameraRef = useRef(null);
   const [message, setMessage] = useState('loading...');
   const [showTryAgain, setShowTryAgain] = useState(false);
@@ -27,7 +29,7 @@ const AuthScreen = ({ navigation, route }) => {
               cameraRef.current.stop();
               setMessage("Processing");
               try {
-                let authResult = await session.postReverify(faceDetectionResult, jobId);
+                let authResult = await session.postReverify(faceDetectionResult, jobId, matchType);
                 if (authResult.result.success == true) {
                   setMessage("Successfully reverified. Please continue to next step");  
                 } else {

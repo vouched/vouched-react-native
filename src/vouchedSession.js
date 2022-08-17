@@ -44,11 +44,12 @@ export class VouchedSession {
         }
     }
 
-    async postReverify(faceDetectionResult, jobId) {
+    async postReverify(faceDetectionResult, jobId, photoType) {
         try {
             const res = await VouchedSessionModule.postReverify({
                 faceDetectionResult,
-                jobId
+                jobId,
+                photoType
             });
             return JSON.parse(res);
         } catch (e) {

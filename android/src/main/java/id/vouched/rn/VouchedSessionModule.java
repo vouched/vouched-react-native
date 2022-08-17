@@ -171,11 +171,12 @@ public class VouchedSessionModule extends ReactContextBaseJavaModule {
         }
 
         String jobId = detectResult.getString("jobId");
+        String photoType = detectResult.getString("photoType");
         ReadableMap faceDetection = detectResult.getMap("faceDetectionResult");
         String userPhoto = faceDetection.getString("image");
 
         try {
-            session.postReverification(getReactApplicationContext(), jobId, userPhoto, new Params.Builder(), new VouchedSession.OnJobResponseListener() {
+            session.postReverification(getReactApplicationContext(), jobId, photoType, userPhoto, new Params.Builder(), new VouchedSession.OnJobResponseListener() {
                 @Override
                 public void onJobResponse(JobResponse jobResponse) {
                     VouchedError jobError = jobResponse.getError();

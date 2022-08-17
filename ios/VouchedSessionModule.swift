@@ -130,6 +130,7 @@ class VouchedSessionModule: NSObject {
 
         // unpack the dict we passed in
         let jobId = detectResult["jobId"]
+        let matchType = detectResult["photoType"]
         let faceDetectDict = detectResult["faceDetectionResult"] as! NSMutableDictionary
         
         do {
