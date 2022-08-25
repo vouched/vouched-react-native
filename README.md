@@ -88,6 +88,15 @@ const job = await session.postBackId(cardDetectionResult, params);
 `Parameters` - [CardDetectResult](#carddetectresult-object), [Params](#params-object)
 `Returns` - [Job](#job-object)
 
+##### POST Back Id image
+
+```javascript
+const job = await session.postBarcode(barcodeResult);
+```
+
+`Parameters` - [barcodeResult](#barcoderesult-object)
+`Returns` - [Job](#job-object)
+
 ##### POST Selfie image
 
 ```javascript
