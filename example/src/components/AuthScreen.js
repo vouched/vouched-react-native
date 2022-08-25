@@ -12,7 +12,7 @@ const AuthScreen = ({ navigation, route }) => {
   const matchType = "selfie";
   const { jobId } = route.params;
   const cameraRef = useRef(null);
-  const [message, setMessage] = useState('loading...');
+  const [message, setMessage] = useState('Center your face in the camera frame');
   const [showTryAgain, setShowTryAgain] = useState(false);
   const [session] = useState(getSession())
 

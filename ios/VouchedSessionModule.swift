@@ -5,6 +5,8 @@ class VouchedSessionModule: NSObject {
 
     private static let SESSION_NOT_CONFIGURED = "SESSION_NOT_CONFIGURED"
     private static let POST_FRONT_ID_FAIL = "POST_FRONT_ID_FAIL"
+    private static let POST_BACK_ID_FAIL = "POST_BACK_ID_FAIL"
+    private static let POST_BARCODE_FAIL = "POST_BARCODE_FAIL"
     private static let POST_FACE_FAIL = "POST_FACE_FAIL"
     private static let POST_CONFIRM_FAIL = "POST_CONFIRM_FAIL"
     private static let POST_AUTHENTICATE_FAIL = "POST_AUTHENTICATE_FAIL"
@@ -74,7 +76,29 @@ class VouchedSessionModule: NSObject {
             resolve(jobString)
         } catch {
             print("\(error)")
-            reject(VouchedSessionModule.POST_FRONT_ID_FAIL, error.localizedDescription, error)
+            reject(VouchedSessionModule.POST_BACK_ID_FAIL, error.localizedDescription, error)
+        }
+        
+    }
+
+    @objc func postBarcode(_ detectResult: NSDictionary, resolver resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
+        
+        if session == nil {
+            reject(VouchedSessionModule.SESSION_NOT_CONFIGURED, "session must be configured", nil);
+            return;
+        }
+        
+        do {
+            let barcodeResult: BarcodeResult
+            if let result = detectResult["result"] as? String {
+                barcodeResult = try JSONDecoder().decode(BarcodeResult.self, from: Data(result.utf8))
+                let job = try session?.postBackId(detectedBarcode: barcodeResult)
+                let jobString = convertObjToString(job!)
+                resolve(jobString)
+            }
+        } catch {
+            print("barcode error: \(error)")
+            reject(VouchedSessionModule.POST_BARCODE_FAIL, error.localizedDescription, error)
         }
         
     }

@@ -1,13 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from 'react-native';
 import { StyleSheet, View } from 'react-native';
 import Footer from 'components/Footer';
-import { VouchedIdCamera, VouchedUtils } from '@vouched.id/vouched-react-native';
+import { VouchedBarcodeCamera, VouchedUtils } from '@vouched.id/vouched-react-native';
 import { getSession} from '../common/session'
 
-const BackIDScreen = ({ navigation, route }) => {
+const BarcodeScreen = ({ navigation, route }) => {
   const cameraRef = useRef(null);
   const [message, setMessage] = useState('Place camera over back of ID');
+  const [nextScreen, setNextScreen] = useState('Face');
   const [showNextButton, setShowNextButton] = useState(false);
   const [session] = useState(getSession());
   const [params] = useState({});
@@ -20,10 +21,6 @@ const BackIDScreen = ({ navigation, route }) => {
               return "image is blurry";
           case "BRIGHTNESS":
               return "image needs to be brighter";
-          case "FACE":
-              return "image is missing required visual markers";
-          case "GLASSES":
-              return "please take off your glasses";
           case "UNKNOWN":
           default:
               return "Unknown Error";
@@ -33,39 +30,38 @@ const BackIDScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <View style={styles.camera}>
-        <VouchedIdCamera 
+        <VouchedBarcodeCamera 
           ref={cameraRef} 
-          enableDistanceCheck={false}
-          onIdStream={async (cardDetectionResult) => {
-            const { instruction, step } = cardDetectionResult;
-
-            if (step === "POSTABLE") {
+          onBarcodeStream={async (barcodeResult) => {
+            const { value, image } = barcodeResult;
+            if (value !== null || image != null) {
               cameraRef.current.stop();
               setMessage("Processing");
               try {
-                let job = await session.postBackId(cardDetectionResult, params);
-                let insights = await VouchedUtils.extractInsights(job);
-                if (insights != null && insights.length > 0) {
-                  setMessage(messageByInsight(insights[0]));
-                  setTimeout(() => {
-                    cameraRef.current.restart();
-                  }, 5000);
-                } else {
-                  setMessage("Please continue to next step");
-                  setShowNextButton(true);
-                }
+              let job = await session.postBarcode(barcodeResult);
+              let insights = await VouchedUtils.extractInsights(job);
+
+              if (insights != null && insights.length > 0) {
+                setMessage(messageByInsight(insights[0]));
+                setTimeout(() => {
+                  cameraRef.current.restart();
+                }, 2000);
+              } else {
+                setMessage("Please continue to next step");
+                setShowNextButton(true);
+              }
               } catch (e) {
-                console.error(e)
+              console.error(e)
               }        
-            } else {
-              setMessage(instruction)
-            }
-          }}
+              } else {
+              setMessage("Place over barcode")
+              }
+              }}
         />
       </View>
       { showNextButton &&
         <View style={styles.nextButton}>
-          <Button title="Next Step: Face" onPress={() => navigation.navigate('Face')} />
+          <Button title="Next Step" onPress={() => navigation.navigate(`${nextScreen}`)} />
         </View>
       }
       <Footer message={message} showHome={true} navigation={navigation} />
@@ -89,4 +85,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default BackIDScreen;
+export default BarcodeScreen;

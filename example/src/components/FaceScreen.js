@@ -7,7 +7,7 @@ import { getSession} from '../common/session'
 
 const FaceScreen = ({ navigation, route }) => {
   const cameraRef = useRef(null);
-  const [message, setMessage] = useState('loading...');
+  const [message, setMessage] = useState('Center your face in camera frame');
   const [showNextButton, setShowNextButton] = useState(false);
   const [session] = useState(getSession())
 

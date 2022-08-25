@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.Log;
 import android.util.Size;
 import android.view.Choreographer;
 import android.view.LayoutInflater;
@@ -29,15 +30,15 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.concurrent.ExecutionException;
 
-import id.vouched.android.CardDetect;
-import id.vouched.android.CardDetectOptions;
-import id.vouched.android.CardDetectResult;
-import id.vouched.android.Step;
+import id.vouched.android.BarcodeDetect;
+import id.vouched.android.BarcodeResult;
 import id.vouched.android.exception.VouchedAssetsMissingException;
 
-public class IdCameraView extends ConstraintLayout implements LifecycleEventListener, CardDetect.OnDetectResultListener {
-    public static final String ON_ID_STREAM_EVENT = "onIdStream";
-    private static final Size DESIRED_PREVIEW_SIZE = new Size(720, 1280);
+public class BarcodeCameraView extends ConstraintLayout 
+    implements LifecycleEventListener, BarcodeDetect.OnBarcodeResultListener {
+
+    public static final String ON_BARCODE_STREAM_EVENT = "onBarcodeStream";
+    private static final Size DESIRED_PREVIEW_BARCODE_SIZE = new Size(1080, 1920);
 
     private final ThemedReactContext mThemedReactContext;
     private final CameraSelector cameraSelector;
@@ -50,17 +51,16 @@ public class IdCameraView extends ConstraintLayout implements LifecycleEventList
     private Handler handler;
     private HandlerThread handlerThread;
 
-    private CardDetect cardDetect;
+    private BarcodeDetect barcodeDetect;
 
     private boolean isRendered = false;
     private boolean isStopped = false;
 
-    public IdCameraView(@NonNull ThemedReactContext themedReactContext) throws VouchedAssetsMissingException {
+    public BarcodeCameraView(@NonNull ThemedReactContext themedReactContext) {
         super(themedReactContext);
-
         mThemedReactContext = themedReactContext;
         activity = themedReactContext.getCurrentActivity();
-        cardDetect = new CardDetect(themedReactContext.getAssets(), CardDetectOptions.defaultOptions(), this);
+        barcodeDetect = new BarcodeDetect(this);
         cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build();
 
         ConstraintLayout layout = (ConstraintLayout) LayoutInflater.from(themedReactContext).inflate(R.layout.id_camera, this, true);
@@ -77,15 +77,8 @@ public class IdCameraView extends ConstraintLayout implements LifecycleEventList
         setupLayoutHack();
     }
 
-    public void setEnableDistanceCheck(boolean enableDistanceCheck) throws VouchedAssetsMissingException {
-        cardDetect = new CardDetect(mThemedReactContext.getAssets(), new CardDetectOptions.Builder().withEnableDistanceCheck(enableDistanceCheck).build(), this);
-    }
-
     @Override
     public void onHostResume() {
-        if (cardDetect != null) {
-            cardDetect.reset();
-        }
         handlerThread = new HandlerThread("inference");
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
@@ -146,7 +139,7 @@ public class IdCameraView extends ConstraintLayout implements LifecycleEventList
         }
 
         Preview.Builder builder = new Preview.Builder();
-        builder.setTargetResolution(DESIRED_PREVIEW_SIZE);
+        builder.setTargetResolution(DESIRED_PREVIEW_BARCODE_SIZE);
         previewUseCase = builder.build();
         previewUseCase.setSurfaceProvider(previewView.getSurfaceProvider());
         cameraProvider.bindToLifecycle((LifecycleOwner) activity, cameraSelector, previewUseCase);
@@ -161,7 +154,7 @@ public class IdCameraView extends ConstraintLayout implements LifecycleEventList
         }
 
         ImageAnalysis.Builder builder = new ImageAnalysis.Builder();
-        builder.setTargetResolution(DESIRED_PREVIEW_SIZE);
+        builder.setTargetResolution( DESIRED_PREVIEW_BARCODE_SIZE);
         analysisUseCase = builder.build();
 
         analysisUseCase.setAnalyzer(
@@ -171,9 +164,9 @@ public class IdCameraView extends ConstraintLayout implements LifecycleEventList
                     @Override
                     public void analyze(@NonNull ImageProxy imageProxy) {
                         try {
-                            if (cardDetect != null) {
-                                cardDetect.processImageProxy(imageProxy, handler);
-                            }
+                            if (barcodeDetect != null) {
+                                barcodeDetect.findBarcode(imageProxy);
+                            } 
                         } catch (Exception e) {
                             System.out.println("Failed to process image. Error: " + e.getLocalizedMessage());
                         }
@@ -184,28 +177,20 @@ public class IdCameraView extends ConstraintLayout implements LifecycleEventList
     }
 
     @Override
-    public void onCardDetectResult(CardDetectResult cardDetectResult) {
-        isRendered = true;
-        sendCardDetectEvent(cardDetectResult);
+    public void onBarcodeResult(BarcodeResult barcodeResult) {
+        if (barcodeResult != null) {
+            isRendered = true;
+            sendBarcodeDetectEvent(barcodeResult);
+        }
     }
 
-    private void sendCardDetectEvent(CardDetectResult cardDetectResult) {
+    private void sendBarcodeDetectEvent(BarcodeResult barcodeResult) {
         WritableMap event = Arguments.createMap();
-        event.putString("step", cardDetectResult.getStep().name());
-        event.putString("instruction", cardDetectResult.getInstruction().name());
-        event.putString("image", cardDetectResult.getImage());
-        event.putString("distanceImage", cardDetectResult.getDistanceImage());
+        event.putString("value", barcodeResult.getValue());
+        event.putString("image", barcodeResult.getImage());
         mThemedReactContext
                 .getJSModule(RCTEventEmitter.class)
-                .receiveEvent(getId(), ON_ID_STREAM_EVENT, event);
-
-        try {
-            if (cardDetectResult.getStep() == Step.POSTABLE) {
-                Thread.sleep(1000);
-            }
-        } catch (InterruptedException e) {
-            // do nothing
-        }
+                .receiveEvent(getId(), ON_BARCODE_STREAM_EVENT, event);
     }
 
     private void setupLayoutHack() {
@@ -240,9 +225,6 @@ public class IdCameraView extends ConstraintLayout implements LifecycleEventList
         if (cameraProvider != null) {
             cameraProvider.unbindAll();
         }
-        if (cardDetect != null) {
-            cardDetect.reset();
-        }
     }
 
     public void start() {
@@ -252,3 +234,4 @@ public class IdCameraView extends ConstraintLayout implements LifecycleEventList
     }
 
 }
+

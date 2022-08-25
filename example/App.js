@@ -7,6 +7,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from 'components/HomeScreen';
 import IDScreen from 'components/IDScreen';
 import BackIDScreen from 'components/BackIDScreen';
+import BarcodeScreen from 'components/BarcodeScreen';
 import FaceScreen from 'components/FaceScreen';
 import DoneScreen from 'components/DoneScreen';
 import AuthScreen from 'components/AuthScreen';
@@ -73,6 +74,11 @@ const App = () => {
         <Stack.Screen
           name="BackID"
           component={BackIDScreen}
+          options={{ headerLeft: null }}
+        />
+        <Stack.Screen
+          name="Barcode"
+          component={BarcodeScreen}
           options={{ headerLeft: null }}
         />
         <Stack.Screen

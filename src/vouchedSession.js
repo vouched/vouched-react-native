@@ -25,6 +25,15 @@ export class VouchedSession {
             throw e
         }
     }
+
+    async postBarcode(barcodeResult) {
+        try {
+            const res = await VouchedSessionModule.postBarcode(barcodeResult);
+            return JSON.parse(res);
+        } catch (e) {
+            throw e
+        }
+    }
     
     async postFace(faceDetectionResult) {
         try {

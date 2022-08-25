@@ -16,6 +16,6 @@ public class VouchedPackage implements ReactPackage {
 
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
-        return Arrays.<ViewManager>asList(new VouchedIdManager(), new VouchedFaceManager());
+        return Arrays.<ViewManager>asList(new VouchedIdManager(), new VouchedFaceManager(), new VouchedBarcodeManager());
     }
 }

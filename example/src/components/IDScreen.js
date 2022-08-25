@@ -7,7 +7,7 @@ import { getSession} from '../common/session'
 
 const IDScreen = ({ navigation, route }) => {
   const cameraRef = useRef(null);
-  const [message, setMessage] = useState('loading...');
+  const [message, setMessage] = useState('Place camera over front of ID');
   const [nextScreen, setNextScreen] = useState('Face')
   const [showNextButton, setShowNextButton] = useState(false);
   const [session] = useState(getSession());
@@ -57,6 +57,12 @@ const IDScreen = ({ navigation, route }) => {
                   if (job.result.captureBackId == true) {
                     setMessage("Flip ID over to scan back of ID");  
                     setNextScreen('BackID');
+                  } 
+                  // note: if the backside and the barcode are 
+                  // requested, use the barcode scan, its much faster
+                  if (job.result.hasPDF417Back == true) {
+                    setMessage("Flip ID over to scan barcode");  
+                    setNextScreen('Barcode');
                   } 
                   setShowNextButton(true);
                 }

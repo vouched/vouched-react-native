@@ -14,6 +14,7 @@ import com.facebook.react.bridge.ReadableType;
 
 import java.util.Map;
 
+import id.vouched.android.BarcodeResult;
 import id.vouched.android.CardDetectResult;
 import id.vouched.android.FaceDetectResult;
 import id.vouched.android.VouchedSession;
@@ -27,6 +28,7 @@ public class VouchedSessionModule extends ReactContextBaseJavaModule {
 
     private static final String SESSION_NOT_CONFIGURED = "SESSION_NOT_CONFIGURED";
     private static final String POST_FRONT_ID_FAIL = "POST_FRONT_ID_FAIL";
+    private static final String POST_BARCODE_FAIL = "POST_BARCODE_FAIL";
     private static final String POST_BACK_ID_FAIL = "POST_BACK_ID_FAIL";
     private static final String POST_FACE_FAIL = "POST_FACE_FAIL";
     private static final String CONFIRM_FAIL = "CONFIRM_FAIL";
@@ -119,6 +121,35 @@ public class VouchedSessionModule extends ReactContextBaseJavaModule {
 
         try {
             session.postBackId(getReactApplicationContext(), cardDetectResult, new Params.Builder(), new VouchedSession.OnJobResponseListener() {
+                @Override
+                public void onJobResponse(JobResponse jobResponse) {
+                    VouchedError jobError = jobResponse.getError();
+                    if (jobError != null) {
+                        promise.reject(POST_BACK_ID_FAIL, jobError.getMessage());
+                    } else {
+                        promise.resolve(jobResponse.getJob().toJson());
+                    }
+                }
+            });
+        } catch (Exception e) {
+            promise.reject(e);
+        }
+    }
+
+    @ReactMethod
+    public void postBarcode(ReadableMap detectResult, final Promise promise) {
+        if (session == null) {
+            promise.reject(SESSION_NOT_CONFIGURED, "session must be configured");
+            return;
+        }
+
+        String barcodeText = detectResult.getString("value");
+        String image = detectResult.getString("image");
+
+        BarcodeResult barcodeResult = new BarcodeResult(barcodeText, image);
+
+        try {
+            session.postBackId(getReactApplicationContext(), barcodeResult, new Params.Builder(), new VouchedSession.OnJobResponseListener() {
                 @Override
                 public void onJobResponse(JobResponse jobResponse) {
                     VouchedError jobError = jobResponse.getError();

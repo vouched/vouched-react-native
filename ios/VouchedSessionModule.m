@@ -13,6 +13,10 @@ RCT_EXTERN_METHOD(postBackId: NSDictionary
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject
                   )
+RCT_EXTERN_METHOD(postBarcode: NSDictionary
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter: (RCTPromiseRejectBlock)reject
+                  )
 RCT_EXTERN_METHOD(postFace: NSDictionary
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject
