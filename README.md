@@ -231,6 +231,50 @@ cameraRef.current.stop();
 cameraRef.current.restart();
 ```
 
+### BarcodeCamera
+
+Import and add to View
+
+```javascript
+import { BarcodeCamera } from '@vouched.id/vouched-react-native';
+...
+
+    <VouchedBarcodeCamera
+        ref={cameraRef}
+        onBarcodeStream={async (barcodeResult) => {
+                cameraRef.current.stop();
+                setMessage("Processing Image");
+                try {
+                    let job = await session.postBarcode(barcodeResult);
+                    let insights = await VouchedUtils.extractInsights(job);
+                    // optionally retry based on insights
+                    // proceed to next step
+                } catch (e) {
+                    // handle error
+                }
+            } else {
+                setMessage(instruction)
+            }
+        }}
+    />
+```
+
+| Properties   |                          Type                          |  Default |
+| ------------ | :----------------------------------------------------: | -------: |
+| onBarcodeStream | Callback<[BarcodeResult](#barcoderesult-object)> |          |
+
+##### Stop FaceCamera
+
+```javascript
+cameraRef.current.stop();
+```
+
+##### Restart FaceCamera
+
+```javascript
+cameraRef.current.restart();
+```
+
 ### Types
 
 ##### CardDetectResult `Object`
@@ -254,6 +298,15 @@ Note: shouldn't be POSTed until the step is `"POSTABLE"`
     "step": String,
     "image": String?,
     "userDistanceImage": String?
+}
+```
+
+##### BarcodeResult `Object`
+
+```javascript
+{
+    "image": String?,
+    "value": String?
 }
 ```
 
