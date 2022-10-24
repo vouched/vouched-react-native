@@ -1,0 +1,20 @@
+diff --git a/node_modules/react-native/React/CoreModules/RCTActionSheetManager.mm b/node_modules/react-native/React/CoreModules/RCTActionSheetManager.mm
+index ee3c7b6..9f683cb 100644
+--- a/node_modules/react-native/React/CoreModules/RCTActionSheetManager.mm
++++ b/node_modules/react-native/React/CoreModules/RCTActionSheetManager.mm
+@@ -95,7 +95,7 @@ - (void)presentViewController:(UIViewController *)alertController
+   NSNumber *anchor = [RCTConvert NSNumber:options.anchor() ? @(*options.anchor()) : nil];
+   UIColor *tintColor = [RCTConvert UIColor:options.tintColor() ? @(*options.tintColor()) : nil];
+   UIColor *cancelButtonTintColor =
+-      [RCTConvert UIColor:options.cancelButtonTintColor() ? @(*options.cancelButtonTintColor()) : nil];
++      [RCTConvert UIColor:options.tintColor() ? @(*options.tintColor()) : nil];
+ 
+   if (controller == nil) {
+     RCTLogError(
+diff --git a/node_modules/react-native/scripts/.packager.env b/node_modules/react-native/scripts/.packager.env
+new file mode 100644
+index 0000000..361f5fb
+--- /dev/null
++++ b/node_modules/react-native/scripts/.packager.env
+@@ -0,0 +1 @@
++export RCT_METRO_PORT=8081

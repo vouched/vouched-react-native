@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Button } from 'react-native';
-import { StyleSheet, View } from 'react-native';
+import { Alert, Button } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import Footer from 'components/Footer';
 import { VouchedIdCamera, VouchedUtils } from '@vouched.id/vouched-react-native';
 import { getSession} from '../common/session'
+import { getLocation } from '../common/GeolocationUtils'
+import * as Consts from '../common/Consts' 
 
 const IDScreen = ({ navigation, route }) => {
   const cameraRef = useRef(null);
@@ -11,7 +13,7 @@ const IDScreen = ({ navigation, route }) => {
   const [nextScreen, setNextScreen] = useState('Face')
   const [showNextButton, setShowNextButton] = useState(false);
   const [session] = useState(getSession());
-  const [params] = useState({});
+  const [params, setParams] = useState({});
 
   const messageByInsight = (insight) => {
       switch (insight) {
@@ -31,9 +33,51 @@ const IDScreen = ({ navigation, route }) => {
       }
   }
 
+  const geoLocationMessage = (geoLocationData) => {
+    if(!Consts.GEOLOCATION_FEATURE_ENABLED) return "";
+    if(geoLocationData == null){
+      return "Getting geolocation data";
+    } else if(geoLocationData.latitude && geoLocationData.longitude){
+      return `Lat: ${geoLocationData.latitude}  Lng: ${geoLocationData.longitude}`;
+    }
+    return "Unable to determine user location"
+  }
+
+  const fetchLocation = ()=> {
+    getLocation().then(
+      result => {
+        setParams({
+          ...params,
+          geoLocation:{
+            latitude: result.coords.latitude,
+            longitude: result.coords.longitude
+          }
+        })
+      },
+      error => {
+        setParams({
+          ...params,
+          geoLocation:{
+            error: "Unable to determine user location"
+          }
+        })
+        if(error){
+          Alert.alert(`Code ${error.code}`, error.message);
+        }
+      }
+    );
+  }
+
+  useEffect(()=> {
+    if(Consts.GEOLOCATION_FEATURE_ENABLED){
+      fetchLocation();
+    }
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.camera}>
+	    {Consts.GEOLOCATION_FEATURE_ENABLED && <Text>{geoLocationMessage(params.geoLocation)}</Text>}
         <VouchedIdCamera 
           ref={cameraRef} 
           enableDistanceCheck={false}
@@ -74,7 +118,7 @@ const IDScreen = ({ navigation, route }) => {
             }
           }}
         />
-      </View>
+      </View>     
       { showNextButton &&
         <View style={styles.nextButton}>
           <Button title="Next Step" onPress={() => navigation.navigate(`${nextScreen}`)} />
