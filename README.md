@@ -2,6 +2,10 @@
 
 [![npm version](https://img.shields.io/npm/v/@vouched.id/vouched-react-native.svg?style=flat-square)](https://www.npmjs.com/package/@vouched.id/vouched-react-native)
 
+## React Native Compaitibility
+
+Vouched React Native supports RN frameworks up to 0.6.8
+
 ## Get Started
 
 If this is your first time here, [Run the Example](#run-example) to get familiar.  
