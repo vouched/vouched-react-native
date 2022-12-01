@@ -7,7 +7,7 @@ use_frameworks! :linkage => :static
 target 'example' do
   config = use_native_modules!
 
-  use_react_native!(:path => config["reactNativePath"])
+  use_react_native!(:path => config[:reactNativePath])
 
   target 'exampleTests' do
     inherit! :complete

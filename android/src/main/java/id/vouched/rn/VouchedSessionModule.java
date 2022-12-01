@@ -20,7 +20,8 @@ import id.vouched.android.FaceDetectResult;
 import id.vouched.android.VouchedSession;
 import id.vouched.android.VouchedSessionParameters;
 import id.vouched.android.model.AuthenticationResponse;
-import id.vouched.android.model.GeoLocation;
+// TODO uncomment when reimplementing version 1.3.3 of the SDK
+// import id.vouched.android.model.GeoLocation;
 import id.vouched.android.model.JobResponse;
 import id.vouched.android.model.Params;
 import id.vouched.android.model.error.VouchedError;
@@ -91,8 +92,8 @@ public class VouchedSessionModule extends ReactContextBaseJavaModule {
                 .withFirstName(parameters.getString("firstName"))
                 .withLastName(parameters.getString("lastName"))
                 .withPhone(parameters.getString("phone"));
-
-        ReadableMap geoLocationMap = parameters.getMap("geoLocation");
+        // TODO uncomment when reimplementing version 1.3.3 of the SDK
+        /* ReadableMap geoLocationMap = parameters.getMap("geoLocation");
         if(geoLocationMap != null){
             builder.withGeoLocation(
                 new GeoLocation(
@@ -101,7 +102,7 @@ public class VouchedSessionModule extends ReactContextBaseJavaModule {
                     geoLocationMap.getString("")
                 )
             );
-        }
+        } */
         try {
             session.postFrontId(getReactApplicationContext(), cardDetectResult, builder, new VouchedSession.OnJobResponseListener() {
                 @Override
