@@ -57,9 +57,10 @@ your app's verification flow. Some IDs require processing both front
 and back sides.
 
 1. Determine the steps needed (ID, ID + Selfie, Reverification)
-2. Create the Component/Screen(s) for each step
-3. Use the appropriate Camera ([IdCamera](#idcamera) or [FaceCamera](#facecamera)) for the step.
-4. Ensure [session.confirm](#post-confirm-verification) is called once verification is complete to recieve finalized job data.
+2. Create one VouchedSession object that is used for the life of the IDV process
+3. Create the Component/Screen(s) for each step. Note how the demo shares the session via useState
+4. Use the appropriate Camera ([IdCamera](#idcamera) or [FaceCamera](#facecamera)) for the step.
+5. Ensure [session.confirm](#post-confirm-verification) is called once verification is complete to recieve finalized job data.
 
 ## Reference
 
