@@ -400,6 +400,8 @@ Note: shouldn't be POSTed until the step is `"POSTABLE"`
 
 ##### Params `Object`
 
+Note: For id verification jobs the `idPhoto` field is a required
+
 ```javascript
 {
     "birthDate": String?,
@@ -407,6 +409,7 @@ Note: shouldn't be POSTed until the step is `"POSTABLE"`
     "firstName": String?,
     "lastName": String?,
     "phone": String?
+    "idPhoto": String? //The user's base64-encoded photo of identification document (front). Supported types are image/png, image/jpeg. required for id verification jobs
 }
 ```
 
