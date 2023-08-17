@@ -400,7 +400,7 @@ Note: shouldn't be POSTed until the step is `"POSTABLE"`
 
 ##### Params `Object`
 
-Note: For id verification jobs the `idPhoto` field is a required
+In some cases it is useful to compare user input with what is actually discovered when an ID is processed by Vouched. You can pass these optional verification parameters for comparison by adding them to the params block:
 
 ```javascript
 {
@@ -409,7 +409,6 @@ Note: For id verification jobs the `idPhoto` field is a required
     "firstName": String?,
     "lastName": String?,
     "phone": String?
-    "idPhoto": String? //The user's base64-encoded photo of identification document (front). Supported types are image/png, image/jpeg. required for id verification jobs
 }
 ```
 
