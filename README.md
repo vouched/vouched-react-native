@@ -2,6 +2,10 @@
 
 [![npm version](https://img.shields.io/npm/v/@vouched.id/vouched-react-native.svg?style=flat-square)](https://www.npmjs.com/package/@vouched.id/vouched-react-native)
 
+## React Native Compatibility
+
+Vouched React Native supports RN frameworks up to 0.70.6. Note: no turbo moodule or Expo integration is supported at this time
+
 ## Get Started
 
 If this is your first time here, [Run the Example](#run-example) to get familiar.  
@@ -53,9 +57,10 @@ your app's verification flow. Some IDs require processing both front
 and back sides.
 
 1. Determine the steps needed (ID, ID + Selfie, Reverification)
-2. Create the Component/Screen(s) for each step
-3. Use the appropriate Camera ([IdCamera](#idcamera) or [FaceCamera](#facecamera)) for the step.
-4. Ensure [session.confirm](#post-confirm-verification) is called once verification is complete to recieve finalized job data.
+2. Create one VouchedSession object that is used for the life of the IDV process
+3. Create the Component/Screen(s) for each step. Note how the demo shares the session via useState
+4. Use the appropriate Camera ([IdCamera](#idcamera) or [FaceCamera](#facecamera)) for the step.
+5. Ensure [session.confirm](#post-confirm-verification) is called once verification is complete to recieve finalized job data.
 
 ## Reference
 
@@ -231,6 +236,50 @@ cameraRef.current.stop();
 cameraRef.current.restart();
 ```
 
+### BarcodeCamera
+
+Import and add to View
+
+```javascript
+import { BarcodeCamera } from '@vouched.id/vouched-react-native';
+...
+
+    <VouchedBarcodeCamera
+        ref={cameraRef}
+        onBarcodeStream={async (barcodeResult) => {
+                cameraRef.current.stop();
+                setMessage("Processing Image");
+                try {
+                    let job = await session.postBarcode(barcodeResult);
+                    let insights = await VouchedUtils.extractInsights(job);
+                    // optionally retry based on insights
+                    // proceed to next step
+                } catch (e) {
+                    // handle error
+                }
+            } else {
+                setMessage(instruction)
+            }
+        }}
+    />
+```
+
+| Properties   |                          Type                          |  Default |
+| ------------ | :----------------------------------------------------: | -------: |
+| onBarcodeStream | Callback<[BarcodeResult](#barcoderesult-object)> |          |
+
+##### Stop FaceCamera
+
+```javascript
+cameraRef.current.stop();
+```
+
+##### Restart FaceCamera
+
+```javascript
+cameraRef.current.restart();
+```
+
 ### Types
 
 ##### CardDetectResult `Object`
@@ -254,6 +303,15 @@ Note: shouldn't be POSTed until the step is `"POSTABLE"`
     "step": String,
     "image": String?,
     "userDistanceImage": String?
+}
+```
+
+##### BarcodeResult `Object`
+
+```javascript
+{
+    "image": String?,
+    "value": String?
 }
 ```
 
@@ -342,6 +400,11 @@ Note: shouldn't be POSTed until the step is `"POSTABLE"`
 
 ##### Params `Object`
 
+Vouched session calls send a number of parameters to the api service as the user goes through the verification process. Those paramters include images for IDs and selfies, barcode data extracted from IDs, etc. 
+
+In some cases it is useful to add user input (sometimes referred to to as verification properties) into the parameter block, so that you can compare those values with what is actually discovered when an ID is processed by Vouched. You can pass these optional parameters, which will compare the input to what is actually found, and determine if the job is to be passed or failed bassed on those optional parameters.
+
+Optional parameters:
 ```javascript
 {
     "birthDate": String?,
@@ -350,6 +413,17 @@ Note: shouldn't be POSTed until the step is `"POSTABLE"`
     "lastName": String?,
     "phone": String?
 }
+```
+as an example:
+```javascript
+const verifyParams = {
+              "firstName" : "Joe",
+              "lastName" : "Smith",
+              "birthDate" : "07/27/1959"
+            };
+try {
+  let job = await session.postFrontId(cardDetectionResult, verifyParams);
+  ...
 ```
 
 ##### LivenessMode `String`
