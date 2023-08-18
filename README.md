@@ -402,7 +402,9 @@ Note: shouldn't be POSTed until the step is `"POSTABLE"`
 
 Vouched session calls send a number of parameters to the api service as the user goes through the verification process. Those paramters include images for IDs and selfies, barcode data extracted from IDs, etc. 
 
-In some cases it is useful to append user input (sometimes referred to to as verification properties) in the parameter block, so that you can compare those values with what is actually discovered when an ID is processed by Vouched. You can pass these optional parameters, which will compare the input to what is actually found.
+In some cases it is useful to add user input (sometimes referred to to as verification properties) into the parameter block, so that you can compare those values with what is actually discovered when an ID is processed by Vouched. You can pass these optional parameters, which will compare the input to what is actually found, and determine if the job is to be passed or failed bassed on those optional parameters.
+
+Optional parameters:
 ```javascript
 {
     "birthDate": String?,
