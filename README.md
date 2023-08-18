@@ -400,8 +400,9 @@ Note: shouldn't be POSTed until the step is `"POSTABLE"`
 
 ##### Params `Object`
 
-In some cases it is useful to compare user input with what is actually discovered when an ID is processed by Vouched. You can pass these optional verification parameters for comparison by adding them to the params block:
+Vouched session calls send a number of parameters to the api service as the user goes through the verification process. Those paramters include images for IDs and selfies, barcode data extracted from IDs, etc. 
 
+In some cases it is useful to append user input (sometimes referred to to as verification properties) in the parameter block, so that you can compare those values with what is actually discovered when an ID is processed by Vouched. You can pass these optional parameters, which will compare the input to what is actually found.
 ```javascript
 {
     "birthDate": String?,
@@ -410,6 +411,17 @@ In some cases it is useful to compare user input with what is actually discovere
     "lastName": String?,
     "phone": String?
 }
+```
+as an example:
+```javascript
+const verifyParams = {
+              "firstName" : "Joe",
+              "lastName" : "Smith",
+              "birthDate" : "07/27/1959"
+            };
+try {
+  let job = await session.postFrontId(cardDetectionResult, verifyParams);
+  ...
 ```
 
 ##### LivenessMode `String`
