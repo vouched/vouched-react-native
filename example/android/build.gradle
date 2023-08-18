@@ -5,6 +5,7 @@ buildscript {
         minSdkVersion = 24
         compileSdkVersion = 31
         targetSdkVersion = 28
+        androidXCore = "1.6.0"
     }
     repositories {
         google()
@@ -20,6 +21,16 @@ buildscript {
 allprojects {
     repositories {
         mavenLocal()
+        exclusiveContent {
+           filter {
+               includeGroup "com.facebook.react"
+           }
+           forRepository {
+               maven {
+                   url "$rootDir/../node_modules/react-native/android"
+               }
+           }
+       }
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
             url("$rootDir/../node_modules/react-native/android")
