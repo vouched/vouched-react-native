@@ -41,6 +41,7 @@ target 'example' do
     # Xcode 14 build issues - https://github.com/facebook/react-native/issues/34673
     installer.pods_project.build_configurations.each do |config|
         config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||=['$(inherited)', '_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION']
     end
    end
 end
