@@ -3,8 +3,8 @@
 buildscript {
     ext {
         minSdkVersion = 24
-        compileSdkVersion = 32
-        targetSdkVersion = 28
+        compileSdkVersion = 33
+        targetSdkVersion = 34
         androidXCore = "1.6.0"
     }
     repositories {
@@ -12,7 +12,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:7.1.0")
+        classpath('com.android.tools.build:gradle:7.4.2')
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
