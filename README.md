@@ -4,7 +4,7 @@
 
 ## React Native Compatibility
 
-Vouched React Native supports RN frameworks up to 0.72  Note: no turbo moodule or Expo integration is supported at this time
+Vouched React Native supports RN frameworks up to 0.75.3  Note: no turbo moodule or Expo integration is supported at this time
 
 ## Get Started
 
