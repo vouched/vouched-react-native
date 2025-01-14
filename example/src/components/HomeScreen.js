@@ -47,6 +47,13 @@ const [hasCameraPermissions, setPermissions] = useState(undefined);
           onPress={() => navigation.navigate('AuthInput')}
         />
       </View>
+      <View style={styles.startButton}>
+        <Button
+          disabled={!hasCameraPermissions}
+          title="Start Selfie Verification"
+          onPress={() => navigation.navigate('Face', {verificationType:'selfieVerification'})}
+        />
+      </View>
     </View>
   );
 };
