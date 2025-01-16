@@ -206,6 +206,35 @@ public class VouchedSessionModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void postSelfieVerification(ReadableMap detectResult, final Promise promise) {
+        if (session == null) {
+            promise.reject(SESSION_NOT_CONFIGURED, "session must be configured");
+            return;
+        }
+
+        String distanceImage = detectResult.getString("userDistanceImage");
+        String image = detectResult.getString("image");
+
+        FaceDetectResult faceDetectResult = new FaceDetectResult(null, null, image, distanceImage);
+
+        try {
+            session.postSelfieVerification(getReactApplicationContext(), faceDetectResult, new Params.Builder(), new VouchedSession.OnJobResponseListener() {
+                @Override
+                public void onJobResponse(JobResponse jobResponse) {
+                    VouchedError jobError = jobResponse.getError();
+                    if (jobError != null) {
+                        promise.reject(POST_SELFIE_VERIFICATION_FAIL, jobError.getMessage());
+                    } else {
+                        promise.resolve(jobResponse.getJob().toJson());
+                    }
+                }
+            });
+        } catch (Exception e) {
+            promise.reject(e);
+        }
+    }
+
+    @ReactMethod
     public void postReverify(ReadableMap detectResult, final Promise promise) {
         if (session == null) {
             promise.reject(SESSION_NOT_CONFIGURED, "session must be configured");
