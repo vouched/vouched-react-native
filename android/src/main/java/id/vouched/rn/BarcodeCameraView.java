@@ -29,6 +29,7 @@ import com.facebook.react.uimanager.events.RCTEventEmitter;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 
 import id.vouched.android.BarcodeDetect;
 import id.vouched.android.BarcodeResult;
@@ -60,7 +61,7 @@ public class BarcodeCameraView extends ConstraintLayout
         super(themedReactContext);
         mThemedReactContext = themedReactContext;
         activity = themedReactContext.getCurrentActivity();
-        barcodeDetect = new BarcodeDetect(this);
+        barcodeDetect = new BarcodeDetect(this.getContext().getAssets(), this);
         cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build();
 
         ConstraintLayout layout = (ConstraintLayout) LayoutInflater.from(themedReactContext).inflate(R.layout.id_camera, this, true);
@@ -165,7 +166,7 @@ public class BarcodeCameraView extends ConstraintLayout
                     public void analyze(@NonNull ImageProxy imageProxy) {
                         try {
                             if (barcodeDetect != null) {
-                                barcodeDetect.findBarcode(imageProxy);
+                                barcodeDetect.findBarcode(imageProxy, handler);
                             } 
                         } catch (Exception e) {
                             System.out.println("Failed to process image. Error: " + e.getLocalizedMessage());
