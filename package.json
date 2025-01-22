@@ -20,7 +20,7 @@
   "homepage": "https://vouched.id",
   "author": "Vouched <support@vouched.id>",
   "peerDependencies": {
-    "react": "^16.13.0",
+    "react": ">=16.13.0",
     "react-native": ">=0.67.0 <1.0.x"
   }
 }
