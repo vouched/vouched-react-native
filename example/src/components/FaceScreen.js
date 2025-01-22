@@ -27,7 +27,7 @@ const FaceScreen = ({ navigation, route }) => {
               setMessage("Processing");
               try {
                 if (verificationType === "selfieVerification") {
-                  await session.postSelfieVerifaction(faceDetectionResult);
+                  await session.postSelfieVerification(faceDetectionResult);
                 }else{
                   await session.postFace(faceDetectionResult);
                 }

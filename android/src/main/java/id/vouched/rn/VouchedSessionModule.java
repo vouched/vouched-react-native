@@ -34,6 +34,7 @@ public class VouchedSessionModule extends ReactContextBaseJavaModule {
     private static final String POST_FACE_FAIL = "POST_FACE_FAIL";
     private static final String CONFIRM_FAIL = "CONFIRM_FAIL";
     private static final String POST_REVERIFY_FAIL = "POST_REVERIFY_FAIL";
+    private static final String POST_SELFIE_VERIFICATION_FAIL = "POST_SELFIE_VERIFICATION_FAIL";
 
     private VouchedSession session;
 
