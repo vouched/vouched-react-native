@@ -44,9 +44,9 @@ export class VouchedSession {
         }
     }
 
-    async postSelfieVerifaction(faceDetectionResult) {
+    async postSelfieVerification(faceDetectionResult) {
         try {
-            const res = await VouchedSessionModule.postSelfieVerifaction(faceDetectionResult);
+            const res = await VouchedSessionModule.postSelfieVerification(faceDetectionResult);
             return JSON.parse(res);
         } catch (e) {
             throw e
