@@ -8,6 +8,7 @@ class VouchedSessionModule: NSObject {
     private static let POST_BACK_ID_FAIL = "POST_BACK_ID_FAIL"
     private static let POST_BARCODE_FAIL = "POST_BARCODE_FAIL"
     private static let POST_FACE_FAIL = "POST_FACE_FAIL"
+    private static let POST_SELFIE_VERIFICATION_FAIL = "POST_SELFIE_VERIFICATION_FAIL"
     private static let POST_CONFIRM_FAIL = "POST_CONFIRM_FAIL"
     private static let POST_AUTHENTICATE_FAIL = "POST_AUTHENTICATE_FAIL"
 
@@ -124,6 +125,32 @@ class VouchedSessionModule: NSObject {
             resolve(jobString)
         } catch {
             reject(VouchedSessionModule.POST_FACE_FAIL, error.localizedDescription, error)
+        }
+        
+    }
+
+        
+    @objc func postSelfieVerification(_ detectResult: NSDictionary, resolver resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
+        
+        if session == nil {
+            reject(VouchedSessionModule.SESSION_NOT_CONFIGURED, "session must be configured", nil);
+            return;
+        }
+        
+        do {
+            let faceDetectResult: FaceDetectResult
+
+            if let result = detectResult["result"] as? String {
+                faceDetectResult = try JSONDecoder().decode(FaceDetectResult.self, from: Data(result.utf8))
+            } else {
+                faceDetectResult = FaceDetectResult(image: nil, distanceImage: nil, step: .postable, instruction: .none)
+            }
+            
+            let job = try session?.postSelfieVerification(detectedFace: faceDetectResult)
+            let jobString = convertObjToString(job!)
+            resolve(jobString)
+        } catch {
+            reject(VouchedSessionModule.POST_SELFIE_VERIFICATION_FAIL, error.localizedDescription, error)
         }
         
     }

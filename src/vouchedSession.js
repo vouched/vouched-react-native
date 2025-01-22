@@ -43,6 +43,15 @@ export class VouchedSession {
             throw e
         }
     }
+
+    async postSelfieVerification(faceDetectionResult) {
+        try {
+            const res = await VouchedSessionModule.postSelfieVerification(faceDetectionResult);
+            return JSON.parse(res);
+        } catch (e) {
+            throw e
+        }
+    }
     
     async confirm() {
         try {

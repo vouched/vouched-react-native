@@ -21,6 +21,10 @@ RCT_EXTERN_METHOD(postFace: NSDictionary
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject
                   )
+RCT_EXTERN_METHOD(postSelfieVerification: NSDictionary
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter: (RCTPromiseRejectBlock)reject
+                  )
 RCT_EXTERN_METHOD(confirm: (RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject
                   )
