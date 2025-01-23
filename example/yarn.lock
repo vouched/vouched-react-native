@@ -2513,10 +2513,10 @@
     semver "^7.3.2"
     tsutils "^3.17.1"
 
-"@vouched.id/vouched-react-native@1.4.2":
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/@vouched.id/vouched-react-native/-/vouched-react-native-1.4.2.tgz#14377e4f08e92b516ded85a01c76ff354473a48e"
-  integrity sha512-bpVf1ON9r49T64GS0UJlI+qBOVGJ7eHyKOEdZ4wKEO+7r/sy9u+wddrglgntIMhoF17h8+0eQKxCEB4A6iAplQ==
+"@vouched.id/vouched-react-native@1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@vouched.id/vouched-react-native/-/vouched-react-native-1.5.0.tgz#425aca0b3ba0176192636209b76a7e9c1c00c146"
+  integrity sha512-w4B4BahjiDwZQaS2A3+C3atbu44aibEbxcnESGIBQ9BcKAfe1qkefIjxREI5f+8zpIlIZC7PGj519toZmrNwQg==
 
 "@yarnpkg/lockfile@^1.1.0":
   version "1.1.0"
