@@ -3,11 +3,17 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 
 platform :ios, '15.0'
 use_frameworks! :linkage => :static
+$RN_FABRIC_ENABLED = true
+$RN_TURBOMODULE_ENABLED = true
 
 target 'example' do
   config = use_native_modules!
 
-  use_react_native!(:path => config[:reactNativePath])
+  use_react_native!(
+    :path => config[:reactNativePath],
+    :fabric_enabled => $RN_FABRIC_ENABLED,
+    :hermes_enabled => true
+  )
 
   target 'exampleTests' do
     inherit! :complete
@@ -25,6 +31,7 @@ target 'example' do
   post_install do |installer|
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
+        config.build_settings['SWIFT_VERSION'] = '5.0'
         deployment_target = config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
           target_components = deployment_target.split
             if target_components.length > 0

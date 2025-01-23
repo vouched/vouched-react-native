@@ -11,6 +11,8 @@ const FaceScreen = ({ navigation, route }) => {
   const [showNextButton, setShowNextButton] = useState(false);
   const [session] = useState(getSession())
 
+  const { verificationType } = route.params;
+
   return (
     <View style={styles.container}>
       <View style={styles.camera}>
@@ -24,7 +26,11 @@ const FaceScreen = ({ navigation, route }) => {
               cameraRef.current.stop();
               setMessage("Processing");
               try {
-                let job = await session.postFace(faceDetectionResult);
+                if (verificationType === "selfieVerification") {
+                  await session.postSelfieVerification(faceDetectionResult);
+                }else{
+                  await session.postFace(faceDetectionResult);
+                }
                 setMessage("Please continue to next step");
                 setShowNextButton(true);
               } catch (e) {
