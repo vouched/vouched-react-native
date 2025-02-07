@@ -33,8 +33,6 @@ local.properties
 #
 .vscode/
 
-package-lock.json
-
 # node.js
 #
 node_modules/
