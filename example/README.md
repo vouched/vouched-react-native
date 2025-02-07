@@ -19,7 +19,7 @@ PUBLIC_KEY=<PUBLIC_KEY>
 ```shell
 
 # npm
-yarn install
+npm ci
 
 # pods
 cd ios && pod install && cd ..
@@ -30,7 +30,7 @@ Unfortunately, cameras are not supported in simulators so the best way to run th
 
 **Start metro server**
 ```shell
-yarn start
+npm start
 ```
 
 

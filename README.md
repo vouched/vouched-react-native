@@ -4,7 +4,7 @@
 
 ## React Native Compatibility
 
-Vouched React Native supports RN frameworks up to 0.75.3  Note: no turbo moodule or Expo integration is supported at this time
+Vouched React Native supports RN frameworks up to 0.75.3 Note: no turbo moodule or Expo integration is supported at this time
 
 ## Get Started
 
@@ -32,7 +32,7 @@ Then, follow steps listed on the [example README](https://github.com/vouched/vou
 Add the package to your existing project
 
 ```shell
-yarn add @vouched.id/vouched-react-native
+npm i -S @vouched.id/vouched-react-native
 ```
 
 Link the package
@@ -51,27 +51,27 @@ Ensure all [prerequisites](#prerequisites) have been met.
 
 ## Create Verification Flow
 
-Note: Be sure to review the IDScreen, BackIDScreen and FaceScreen in 
+Note: Be sure to review the IDScreen, BackIDScreen and FaceScreen in
 the example app to get a sense of possible behaviors you can use in
-your app's verification flow. Some IDs require processing both front 
+your app's verification flow. Some IDs require processing both front
 and back sides.
 
 1. Determine the steps needed (ID, ID + Selfie, Reverification)
-2. Create one VouchedSession object that is used for the life of the IDV process. See our example application 
+2. Create one VouchedSession object that is used for the life of the IDV process. See our example application
 3. Create the Component/Screen(s) for each step. Note how the demo shares the session via useState
 4. Use the appropriate Camera ([IdCamera](#idcamera) or [FaceCamera](#facecamera)) for the step.
 5. Ensure [session.confirm](#post-confirm-verification) is called once verification is complete to recieve finalized job data.
 
 ## Webhook support
 
-The React Native SDK allows a webhook URL to be specified, which is sent to the Vouched api service, and will fire upon job completion 
-(as noted above, you must share a single session object during the verification flow, and call session.confirm for the callback to be triggered). To enable 
+The React Native SDK allows a webhook URL to be specified, which is sent to the Vouched api service, and will fire upon job completion
+(as noted above, you must share a single session object during the verification flow, and call session.confirm for the callback to be triggered). To enable
 this in our example app, the callback url would be be added to the sessionParam block prior to calling initSession. See [App.js](https://github.com/vouched/vouched-react-native/blob/master/example/App.js), :
 
 ```javascript
- const sessionParams = {
-  callbackURL: 'https://webhook.site/97148fec-bd05-4c1f-8b03-ab16d0e6b212',
-  properties: []
+const sessionParams = {
+  callbackURL: "https://webhook.site/97148fec-bd05-4c1f-8b03-ab16d0e6b212",
+  properties: [],
 };
 initSession(PUBLIC_KEY, sessionParams);
 ```
@@ -87,6 +87,7 @@ This class handles a user's Vouched session. It takes care of the API calls
 ```javascript
 const session = new VouchedSession(apiKey, sessionParams);
 ```
+
 `Parameters` - String, [SessionParams](#sessionparams-object)
 
 ##### POST Front Id image
@@ -278,9 +279,9 @@ import { BarcodeCamera } from '@vouched.id/vouched-react-native';
     />
 ```
 
-| Properties   |                          Type                          |  Default |
-| ------------ | :----------------------------------------------------: | -------: |
-| onBarcodeStream | Callback<[BarcodeResult](#barcoderesult-object)> |          |
+| Properties      |                       Type                       | Default |
+| --------------- | :----------------------------------------------: | ------: |
+| onBarcodeStream | Callback<[BarcodeResult](#barcoderesult-object)> |         |
 
 ##### Stop FaceCamera
 
@@ -338,7 +339,7 @@ Note: shouldn't be POSTed until the step is `"POSTABLE"`
     "result": JobResult,
     "id": String,
     "errors": JobError[],
-    "token": String 
+    "token": String
 }
 ```
 
@@ -414,11 +415,12 @@ Note: shouldn't be POSTed until the step is `"POSTABLE"`
 
 ##### Params `Object`
 
-Vouched session calls send a number of parameters to the api service as the user goes through the verification process. Those paramters include images for IDs and selfies, barcode data extracted from IDs, etc. 
+Vouched session calls send a number of parameters to the api service as the user goes through the verification process. Those paramters include images for IDs and selfies, barcode data extracted from IDs, etc.
 
 In some cases it is useful to add user input (sometimes referred to to as verification properties) into the parameter block, so that you can compare those values with what is actually discovered when an ID is processed by Vouched. You can pass these optional parameters, which will compare the input to what is actually found, and determine if the job is to be passed or failed bassed on those optional parameters.
 
 Optional parameters:
+
 ```javascript
 {
     "birthDate": String?,
@@ -428,7 +430,9 @@ Optional parameters:
     "phone": String?
 }
 ```
+
 as an example:
+
 ```javascript
 const verifyParams = {
               "firstName" : "Joe",
