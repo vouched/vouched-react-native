@@ -26,9 +26,9 @@ buildscript {
 allprojects {
     repositories {
         mavenLocal()
-       
         maven {
-            url 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+            name = 'Central Portal Snapshots'
+            url = 'https://central.sonatype.com/repository/maven-snapshots/'
         }
         google()
         mavenCentral()
