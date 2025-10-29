@@ -32,6 +32,7 @@ jobs:
         with:
           node-version: '20.18.1'
           cache: 'npm'
+          registry-url: https://registry.npmjs.org
 
       - name: Update the version in example/package.json
         if: steps.version_check.outputs.changed == 'true'
@@ -41,7 +42,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.version_check.outputs.changed == 'true'
-        run: npm install
+        run: npm ci
 
       - name: Configure Git
         if: steps.version_check.outputs.changed == 'true'
@@ -53,7 +54,7 @@ jobs:
         if: steps.version_check.outputs.changed == 'true'
         run: |
           git add example/package.json
-          git commit -m "chore: update the version in example to ${{ steps.version_check.outputs.version }}"
+          git commit -m "chore: update the version in example to ${{ steps.version_check.outputs.version }} [skip ci]"
           git push
 
       - name: Create a Git tag with the new version
