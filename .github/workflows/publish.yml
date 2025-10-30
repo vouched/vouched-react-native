@@ -33,34 +33,9 @@ jobs:
           cache: 'npm'
           registry-url: https://registry.npmjs.org
 
-      - name: Update the version in example/package.json
-        if: steps.version_check.outputs.changed == 'true'
-        run: |
-          NEW_VERSION=${{ steps.version_check.outputs.version }}
-          jq --arg v "$NEW_VERSION" '.dependencies."@vouched.id/vouched-react-native" = $v' example/package.json > example/package.json.tmp && mv example/package.json.tmp example/package.json
-
       - name: Install dependencies
         if: steps.version_check.outputs.changed == 'true'
         run: npm ci
-
-      - name: Configure Git
-        if: steps.version_check.outputs.changed == 'true'
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-
-      - name: Confirm the version change in example/package.json
-        if: steps.version_check.outputs.changed == 'true'
-        run: |
-          git add example/package.json
-          git commit -m "chore: update the version in example to ${{ steps.version_check.outputs.version }} [skip ci]"
-          git push
-
-      - name: Create a Git tag with the new version
-        if: steps.version_check.outputs.changed == 'true'
-        run: |
-          git tag -a "v${{ steps.version_check.outputs.version }}" -m "Release v${{ steps.version_check.outputs.version }}"
-          git push origin --tags
 
       - name: Publish to NPM
         if: steps.version_check.outputs.changed == 'true'
