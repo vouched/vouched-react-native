@@ -12,13 +12,13 @@ Pod::Spec.new do |s|
   s.homepage     = "https://github.com/github_account/vouched-react-native"
   s.license      = "Apache-2.0"
   s.authors      = { "Vouched" => "support@vouched.id" }
-  s.platforms    = { :ios => "15.0" }
+  s.platforms    = { :ios => "16.0" }
   s.source       = { :git => "https://github.com/vouched/vouched-react-native.git", :tag => "#{s.version}" }
-  s.pod_target_xcconfig = { 'IPHONEOS_DEPLOYMENT_TARGET' => '15.0' }
+  s.pod_target_xcconfig = { 'IPHONEOS_DEPLOYMENT_TARGET' => '16.6' }
 
   s.source_files = "ios/**/*.{h,c,m,swift}"
   s.requires_arc = true
 
   s.dependency "React"
-  s.dependency "Vouched", "1.10.0"
+  s.dependency "Vouched", "1.11.0"
 end
